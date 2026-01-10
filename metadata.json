@@ -1,0 +1,8 @@
+{
+  "name": "HireMind AI - Career Success Platform",
+  "description": "An advanced AI career assistant for FAANG-level resume improvement, ATS scanning, mock interviews, and personalized career roadmaps.",
+  "requestFramePermissions": [
+    "microphone",
+    "camera"
+  ]
+}
