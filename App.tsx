@@ -90,7 +90,7 @@ const App: React.FC = () => {
             {[
               { id: 'resume', label: 'Resume Prep' },
               { id: 'interview', label: 'Interviews' },
-              { id: 'dashboard', label: 'Insights' }
+              { id: 'dashboard', label: 'Performance Records' }
             ].map((v) => (
               <button 
                 key={v.id}
@@ -114,7 +114,7 @@ const App: React.FC = () => {
       </header>
 
       <main className="flex-grow">
-        {view === 'landing' && <LandingPage onStartResume={() => navigate('resume')} />}
+        {view === 'landing' && <LandingPage onStartResume={() => navigate('resume')} onNavigate={navigate} />}
         {view === 'resume' && <ResumeTool onAnalysisComplete={handleResumeAnalysisComplete} setResumeText={setResumeText} />}
         {view === 'interview' && <InterviewTool jobRole={jobRole} techStack={techStack} setTechStack={setTechStack} onEvaluationComplete={handleEvaluationComplete} />}
         {view === 'dashboard' && (
