@@ -7,69 +7,69 @@ interface Props {
 
 const LandingPage: React.FC<Props> = ({ onStartResume }) => {
   return (
-    <div className="relative overflow-hidden">
-      {/* Background Decorative Elements */}
-      <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[1000px] h-[600px] bg-indigo-600/10 blur-[120px] rounded-full -z-10"></div>
-      
-      <div className="max-w-7xl mx-auto px-4 pt-24 pb-32">
-        <div className="text-center">
-          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/5 border border-white/10 text-indigo-400 text-sm font-medium mb-8">
-            <span className="relative flex h-2 w-2">
-              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-indigo-400 opacity-75"></span>
-              <span className="relative inline-flex rounded-full h-2 w-2 bg-indigo-500"></span>
-            </span>
-            Next-Gen Career Intelligence
+    <div className="relative pt-20 pb-32">
+      <div className="max-w-7xl mx-auto px-6">
+        <div className="flex flex-col items-center text-center">
+          <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full glass border border-indigo-500/20 text-indigo-400 text-xs font-bold uppercase tracking-widest mb-10 animate-in fade-in slide-in-from-top-4 duration-700">
+            <span className="w-2 h-2 rounded-full bg-indigo-500 animate-pulse"></span>
+            Intelligence-Powered Careers
           </div>
           
-          <h1 className="text-5xl md:text-7xl font-extrabold tracking-tight text-white mb-6 leading-tight">
-            The AI That Gets You <br />
-            <span className="text-transparent bg-clip-text bg-gradient-to-r from-indigo-400 via-purple-400 to-indigo-500">
-              Hired at FAANG.
+          <h1 className="text-6xl md:text-8xl font-extrabold tracking-tighter text-white mb-8 leading-[0.9] animate-in fade-in slide-in-from-bottom-4 duration-1000">
+            Decode Your <br />
+            <span className="text-transparent bg-clip-text bg-gradient-to-r from-indigo-400 via-emerald-400 to-indigo-500">
+              Future Status.
             </span>
           </h1>
           
-          <p className="text-xl text-slate-400 max-w-2xl mx-auto mb-10 leading-relaxed">
-            Stop guessing why you aren't getting callbacks. HireMind AI scans your resume like a top recruiter and trains you like a senior engineer.
+          <p className="text-lg md:text-xl text-slate-400 max-w-2xl mx-auto mb-12 leading-relaxed animate-in fade-in slide-in-from-bottom-8 duration-1000 delay-150">
+            Beyond templates. Beyond advice. HireMind AI is a professional neural framework for ATS domination and senior-level interview readiness.
           </p>
           
-          <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
+          <div className="flex flex-col sm:flex-row items-center justify-center gap-6 mb-24 w-full sm:w-auto animate-in fade-in slide-in-from-bottom-12 duration-1000 delay-300">
             <button 
               onClick={onStartResume}
-              className="w-full sm:w-auto px-8 py-4 bg-indigo-600 hover:bg-indigo-500 text-white rounded-xl font-bold text-lg transition-all transform hover:scale-105 shadow-2xl shadow-indigo-600/30 flex items-center justify-center gap-3"
+              className="w-full sm:w-auto px-10 py-5 bg-indigo-600 hover:bg-indigo-500 text-white rounded-2xl font-black text-sm tracking-widest uppercase transition-all shadow-2xl shadow-indigo-600/40 active:scale-95 flex items-center justify-center gap-4 group"
             >
-              Scan My Resume <i className="fas fa-arrow-right"></i>
+              Start Neural Scan <i className="fas fa-bolt group-hover:translate-x-1 transition-transform"></i>
             </button>
-            <button className="w-full sm:w-auto px-8 py-4 bg-white/5 hover:bg-white/10 border border-white/10 text-white rounded-xl font-bold text-lg transition-all">
-              Watch Demo
+            <button className="w-full sm:w-auto px-10 py-5 glass hover:bg-white/10 text-white rounded-2xl font-black text-sm tracking-widest uppercase transition-all flex items-center justify-center gap-4">
+              Explore Alpha <i className="fas fa-terminal"></i>
             </button>
           </div>
         </div>
 
-        {/* Features Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mt-32">
+        {/* Feature Grid with Bento-ish style */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           {[
             {
-              icon: "fa-rocket",
-              title: "ATS Optimization",
-              desc: "Deep scan against role-specific keywords and structure patterns used by top product companies."
+              icon: "fa-shield-halved",
+              title: "ATS Cryptography",
+              desc: "Mapping your resume against proprietary recruiter ranking algorithms used by global tech leaders.",
+              color: "border-indigo-500/20"
             },
             {
-              icon: "fa-comments",
-              title: "Mock Interviews",
-              desc: "Real-time voice/text interviews with adaptive difficulty that feels like the real thing."
+              icon: "fa-satellite-dish",
+              title: "Live Simulation",
+              desc: "High-latency neural mock sessions via voice, video, or encrypted text to sharpen technical delivery.",
+              color: "border-emerald-500/20"
             },
             {
-              icon: "fa-map",
-              title: "30-Day Roadmaps",
-              desc: "Personalized learning paths generated from your unique skill gaps and interview performance."
+              icon: "fa-dna",
+              title: "Skill Roadmaps",
+              desc: "Evolutionary growth paths generated from the gaps in your technical DNA and communication style.",
+              color: "border-purple-500/20"
             }
           ].map((f, i) => (
-            <div key={i} className="p-8 rounded-2xl bg-white/5 border border-white/5 hover:border-white/10 transition-all hover:-translate-y-2 group">
-              <div className="w-12 h-12 rounded-xl bg-indigo-600/20 flex items-center justify-center text-indigo-400 text-xl mb-6 group-hover:bg-indigo-600 group-hover:text-white transition-colors">
+            <div key={i} className={`p-10 glass rounded-3xl border-2 ${f.color} hover:bg-white/5 transition-all hover:-translate-y-2 group relative overflow-hidden`}>
+              <div className="absolute -right-4 -bottom-4 text-white/5 text-8xl transition-all group-hover:scale-110 group-hover:text-white/10">
                 <i className={`fas ${f.icon}`}></i>
               </div>
-              <h3 className="text-xl font-bold mb-3">{f.title}</h3>
-              <p className="text-slate-400 leading-relaxed">{f.desc}</p>
+              <div className="w-14 h-14 rounded-2xl bg-white/5 flex items-center justify-center text-white text-2xl mb-8 group-hover:bg-indigo-600 transition-all">
+                <i className={`fas ${f.icon}`}></i>
+              </div>
+              <h3 className="text-xl font-black mb-4 uppercase tracking-tight text-white">{f.title}</h3>
+              <p className="text-slate-400 leading-relaxed text-sm">{f.desc}</p>
             </div>
           ))}
         </div>

@@ -9,17 +9,13 @@ import { AppView, AtsAnalysis, InterviewEvaluation, Message, SavedInterview, Sav
 
 const App: React.FC = () => {
   const [view, setView] = useState<AppView>('landing');
-  
-  // Shared State
   const [jobRole, setJobRole] = useState<string>('');
   const [techStack, setTechStack] = useState<string>('');
   const [resumeText, setResumeText] = useState<string>('');
   
-  // Persistence Keys
   const HISTORY_KEY = 'hiremind_history';
   const RESUME_HISTORY_KEY = 'hiremind_resume_history';
 
-  // Resume History Management
   const [resumeHistory, setResumeHistory] = useState<SavedResumeAnalysis[]>(() => {
     const saved = localStorage.getItem(RESUME_HISTORY_KEY);
     return saved ? JSON.parse(saved) : [];
@@ -29,7 +25,6 @@ const App: React.FC = () => {
     resumeHistory.length > 0 ? resumeHistory[0] : null
   );
 
-  // Interview History Management
   const [interviewHistory, setInterviewHistory] = useState<SavedInterview[]>(() => {
     const saved = localStorage.getItem(HISTORY_KEY);
     return saved ? JSON.parse(saved) : [];
@@ -80,68 +75,44 @@ const App: React.FC = () => {
     navigate('dashboard');
   };
 
-  const handleSelectSession = (session: SavedInterview) => {
-    setActiveInterview(session);
-    setJobRole(session.jobRole);
-    setTechStack(session.techStack);
-  };
-
-  const handleDeleteSession = (id: string) => {
-    setInterviewHistory(prev => prev.filter(s => s.id !== id));
-    if (activeInterview?.id === id) {
-      setActiveInterview(interviewHistory.find(s => s.id !== id) || null);
-    }
-  };
-
-  const handleSelectResume = (analysis: SavedResumeAnalysis) => {
-    setActiveResume(analysis);
-    setJobRole(analysis.jobRole);
-  };
-
-  const handleDeleteResume = (id: string) => {
-    setResumeHistory(prev => prev.filter(r => r.id !== id));
-    if (activeResume?.id === id) {
-      setActiveResume(resumeHistory.find(r => r.id !== id) || null);
-    }
-  };
-
   return (
-    <div className="min-h-screen flex flex-col bg-[#0a0a0b] text-slate-200">
-      <header className="sticky top-0 z-50 border-b border-white/5 bg-[#0a0a0b]/80 backdrop-blur-md">
-        <div className="max-w-7xl mx-auto px-4 h-16 flex items-center justify-between">
-          <button onClick={() => navigate('landing')} className="flex items-center gap-2 text-xl font-bold tracking-tight text-white group">
-            <div className="w-8 h-8 rounded-lg bg-indigo-600 flex items-center justify-center group-hover:bg-indigo-500 transition-colors">
+    <div className="min-h-screen flex flex-col selection:bg-indigo-500/30">
+      <header className="sticky top-0 z-[100] border-b border-white/5 bg-[#030712]/60 backdrop-blur-2xl">
+        <div className="max-w-7xl mx-auto px-6 h-20 flex items-center justify-between">
+          <button onClick={() => navigate('landing')} className="flex items-center gap-3 text-2xl font-black tracking-tighter text-white group">
+            <div className="w-10 h-10 rounded-xl bg-indigo-600 flex items-center justify-center shadow-lg shadow-indigo-600/20 group-hover:scale-110 transition-transform">
               <i className="fas fa-brain"></i>
             </div>
-            <span>HireMind <span className="text-indigo-500">AI</span></span>
+            <span>HireMind<span className="text-indigo-500">.AI</span></span>
           </button>
           
-          <nav className="hidden md:flex items-center gap-8">
-            <button onClick={() => navigate('resume')} className={`hover:text-white transition-colors ${view === 'resume' ? 'text-indigo-400 font-medium' : 'text-slate-400'}`}>Resume Scanner</button>
-            <button onClick={() => navigate('interview')} className={`hover:text-white transition-colors ${view === 'interview' ? 'text-indigo-400 font-medium' : 'text-slate-400'}`}>Mock Interview</button>
-            <button onClick={() => navigate('dashboard')} className={`hover:text-white transition-colors ${view === 'dashboard' ? 'text-indigo-400 font-medium' : 'text-slate-400'}`}>Dashboard</button>
+          <nav className="hidden lg:flex items-center gap-10">
+            {['resume', 'interview', 'dashboard'].map((v) => (
+              <button 
+                key={v}
+                onClick={() => navigate(v as AppView)} 
+                className={`text-[10px] font-black uppercase tracking-[0.2em] transition-all hover:text-white ${view === v ? 'text-indigo-400' : 'text-slate-500'}`}
+              >
+                {v}
+              </button>
+            ))}
           </nav>
 
-          <div className="flex items-center gap-4">
-            <a href="https://github.com" className="p-2 text-slate-400 hover:text-white transition-colors">
-              <i className="fab fa-github text-xl"></i>
-            </a>
-            <button onClick={() => navigate('resume')} className="px-4 py-2 bg-indigo-600 hover:bg-indigo-500 text-white rounded-lg font-medium transition-all shadow-lg shadow-indigo-600/20 active:scale-95">Get Started</button>
+          <div className="flex items-center gap-6">
+            <button onClick={() => navigate('resume')} className="hidden sm:block px-6 py-3 bg-white/5 hover:bg-white/10 text-white rounded-xl text-[10px] font-black uppercase tracking-widest transition-all">
+              Initialize
+            </button>
+            <button onClick={() => navigate('interview')} className="px-6 py-3 bg-indigo-600 hover:bg-indigo-500 text-white rounded-xl text-[10px] font-black uppercase tracking-widest transition-all shadow-xl shadow-indigo-600/20 active:scale-95">
+              Launch Session
+            </button>
           </div>
         </div>
       </header>
 
       <main className="flex-grow">
         {view === 'landing' && <LandingPage onStartResume={() => navigate('resume')} />}
-        
-        {view === 'resume' && (
-          <ResumeTool onAnalysisComplete={handleResumeAnalysisComplete} setResumeText={setResumeText} />
-        )}
-
-        {view === 'interview' && (
-          <InterviewTool jobRole={jobRole} techStack={techStack} setTechStack={setTechStack} onEvaluationComplete={handleEvaluationComplete} />
-        )}
-
+        {view === 'resume' && <ResumeTool onAnalysisComplete={handleResumeAnalysisComplete} setResumeText={setResumeText} />}
+        {view === 'interview' && <InterviewTool jobRole={jobRole} techStack={techStack} setTechStack={setTechStack} onEvaluationComplete={handleEvaluationComplete} />}
         {view === 'dashboard' && (
           <Dashboard 
             activeResume={activeResume}
@@ -152,41 +123,35 @@ const App: React.FC = () => {
             techStack={techStack}
             onStartInterview={() => navigate('interview')}
             onGenerateRoadmap={() => navigate('roadmap')}
-            onSelectSession={handleSelectSession}
-            onDeleteSession={handleDeleteSession}
-            onSelectResume={handleSelectResume}
-            onDeleteResume={handleDeleteResume}
+            onSelectSession={setActiveInterview}
+            onDeleteSession={(id) => setInterviewHistory(h => h.filter(x => x.id !== id))}
+            onSelectResume={setActiveResume}
+            onDeleteResume={(id) => setResumeHistory(h => h.filter(x => x.id !== id))}
           />
         )}
-
         {view === 'roadmap' && (
-          <RoadmapView jobRole={jobRole} atsAnalysis={activeResume} evaluation={activeInterview?.evaluation || null} roadmap={''} setRoadmap={() => {}} />
+          <RoadmapView 
+            jobRole={jobRole} 
+            atsAnalysis={activeResume} 
+            evaluation={activeInterview?.evaluation || null} 
+            roadmap={''} 
+            setRoadmap={() => {}} 
+          />
         )}
       </main>
 
-      <footer className="border-t border-white/5 py-12 bg-black/40">
-        <div className="max-w-7xl mx-auto px-4 grid grid-cols-1 md:grid-cols-3 gap-8 text-center md:text-left">
-          <div>
-            <div className="text-xl font-bold mb-4">HireMind AI</div>
-            <p className="text-slate-500 max-w-xs mx-auto md:mx-0">The professional career assistant for high-performing engineering roles.</p>
+      <footer className="border-t border-white/5 py-16 bg-[#030712]/40">
+        <div className="max-w-7xl mx-auto px-6 text-center">
+          <div className="text-2xl font-black mb-4">HireMind AI</div>
+          <p className="text-slate-500 text-sm max-w-md mx-auto mb-10 font-medium">Elevating engineering careers through high-fidelity AI intelligence and professional simulation.</p>
+          <div className="flex justify-center gap-8 mb-12">
+            {['linkedin', 'twitter', 'github', 'discord'].map(social => (
+              <i key={social} className={`fab fa-${social} text-slate-500 hover:text-white text-xl cursor-pointer transition-colors`}></i>
+            ))}
           </div>
-          <div className="flex flex-col gap-2">
-            <h4 className="font-semibold text-white mb-2">Platform</h4>
-            <button onClick={() => navigate('resume')} className="text-slate-400 hover:text-indigo-400 transition-colors text-left">Resume Scan</button>
-            <button onClick={() => navigate('interview')} className="text-slate-400 hover:text-indigo-400 transition-colors text-left">Interview Prep</button>
-            <button onClick={() => navigate('dashboard')} className="text-slate-400 hover:text-indigo-400 transition-colors text-left">Skill Dashboard</button>
+          <div className="text-[10px] font-bold text-slate-700 uppercase tracking-[0.3em]">
+            &copy; {new Date().getFullYear()} HireMind Neural Systems. All vectors secured.
           </div>
-          <div>
-            <h4 className="font-semibold text-white mb-2">Connect</h4>
-            <div className="flex justify-center md:justify-start gap-4 text-xl">
-              <i className="fab fa-linkedin text-slate-400 hover:text-white cursor-pointer transition-colors"></i>
-              <i className="fab fa-twitter text-slate-400 hover:text-white cursor-pointer transition-colors"></i>
-              <i className="fab fa-discord text-slate-400 hover:text-white cursor-pointer transition-colors"></i>
-            </div>
-          </div>
-        </div>
-        <div className="max-w-7xl mx-auto px-4 mt-8 pt-8 border-t border-white/5 text-center text-slate-600 text-sm">
-          &copy; {new Date().getFullYear()} HireMind AI. Designed for high-impact careers.
         </div>
       </footer>
     </div>
