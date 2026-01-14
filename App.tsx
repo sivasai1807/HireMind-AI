@@ -81,29 +81,33 @@ const App: React.FC = () => {
         <div className="max-w-7xl mx-auto px-6 h-20 flex items-center justify-between">
           <button onClick={() => navigate('landing')} className="flex items-center gap-3 text-2xl font-black tracking-tighter text-white group">
             <div className="w-10 h-10 rounded-xl bg-indigo-600 flex items-center justify-center shadow-lg shadow-indigo-600/20 group-hover:scale-110 transition-transform">
-              <i className="fas fa-brain"></i>
+              <i className="fas fa-briefcase"></i>
             </div>
-            <span>HireMind<span className="text-indigo-500">.AI</span></span>
+            <span>HireMind</span>
           </button>
           
           <nav className="hidden lg:flex items-center gap-10">
-            {['resume', 'interview', 'dashboard'].map((v) => (
+            {[
+              { id: 'resume', label: 'Resume Prep' },
+              { id: 'interview', label: 'Interviews' },
+              { id: 'dashboard', label: 'Insights' }
+            ].map((v) => (
               <button 
-                key={v}
-                onClick={() => navigate(v as AppView)} 
-                className={`text-[10px] font-black uppercase tracking-[0.2em] transition-all hover:text-white ${view === v ? 'text-indigo-400' : 'text-slate-500'}`}
+                key={v.id}
+                onClick={() => navigate(v.id as AppView)} 
+                className={`text-[10px] font-black uppercase tracking-[0.2em] transition-all hover:text-white ${view === v.id ? 'text-indigo-400' : 'text-slate-500'}`}
               >
-                {v}
+                {v.label}
               </button>
             ))}
           </nav>
 
           <div className="flex items-center gap-6">
             <button onClick={() => navigate('resume')} className="hidden sm:block px-6 py-3 bg-white/5 hover:bg-white/10 text-white rounded-xl text-[10px] font-black uppercase tracking-widest transition-all">
-              Initialize
+              Resume Analysis
             </button>
             <button onClick={() => navigate('interview')} className="px-6 py-3 bg-indigo-600 hover:bg-indigo-500 text-white rounded-xl text-[10px] font-black uppercase tracking-widest transition-all shadow-xl shadow-indigo-600/20 active:scale-95">
-              Launch Session
+              Practice Interview
             </button>
           </div>
         </div>
@@ -142,15 +146,15 @@ const App: React.FC = () => {
 
       <footer className="border-t border-white/5 py-16 bg-[#030712]/40">
         <div className="max-w-7xl mx-auto px-6 text-center">
-          <div className="text-2xl font-black mb-4">HireMind AI</div>
-          <p className="text-slate-500 text-sm max-w-md mx-auto mb-10 font-medium">Elevating engineering careers through high-fidelity AI intelligence and professional simulation.</p>
+          <div className="text-2xl font-black mb-4">HireMind</div>
+          <p className="text-slate-500 text-sm max-w-md mx-auto mb-10 font-medium">Empowering your professional journey with high-fidelity performance analysis and career strategy.</p>
           <div className="flex justify-center gap-8 mb-12">
-            {['linkedin', 'twitter', 'github', 'discord'].map(social => (
+            {['linkedin', 'twitter', 'github'].map(social => (
               <i key={social} className={`fab fa-${social} text-slate-500 hover:text-white text-xl cursor-pointer transition-colors`}></i>
             ))}
           </div>
           <div className="text-[10px] font-bold text-slate-700 uppercase tracking-[0.3em]">
-            &copy; {new Date().getFullYear()} HireMind Neural Systems. All vectors secured.
+            &copy; {new Date().getFullYear()} HireMind Career Systems. Professional excellence guaranteed.
           </div>
         </div>
       </footer>

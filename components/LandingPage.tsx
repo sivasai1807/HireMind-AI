@@ -12,18 +12,18 @@ const LandingPage: React.FC<Props> = ({ onStartResume }) => {
         <div className="flex flex-col items-center text-center">
           <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full glass border border-indigo-500/20 text-indigo-400 text-xs font-bold uppercase tracking-widest mb-10 animate-in fade-in slide-in-from-top-4 duration-700">
             <span className="w-2 h-2 rounded-full bg-indigo-500 animate-pulse"></span>
-            Intelligence-Powered Careers
+            Professional Career Excellence
           </div>
           
           <h1 className="text-6xl md:text-8xl font-extrabold tracking-tighter text-white mb-8 leading-[0.9] animate-in fade-in slide-in-from-bottom-4 duration-1000">
-            Decode Your <br />
+            Master Your <br />
             <span className="text-transparent bg-clip-text bg-gradient-to-r from-indigo-400 via-emerald-400 to-indigo-500">
-              Future Status.
+              Professional Path.
             </span>
           </h1>
           
           <p className="text-lg md:text-xl text-slate-400 max-w-2xl mx-auto mb-12 leading-relaxed animate-in fade-in slide-in-from-bottom-8 duration-1000 delay-150">
-            Beyond templates. Beyond advice. HireMind AI is a professional neural framework for ATS domination and senior-level interview readiness.
+            Stop guessing. HireMind provides a professional framework for resume optimization and high-stakes interview readiness designed by recruitment experts.
           </p>
           
           <div className="flex flex-col sm:flex-row items-center justify-center gap-6 mb-24 w-full sm:w-auto animate-in fade-in slide-in-from-bottom-12 duration-1000 delay-300">
@@ -31,33 +31,33 @@ const LandingPage: React.FC<Props> = ({ onStartResume }) => {
               onClick={onStartResume}
               className="w-full sm:w-auto px-10 py-5 bg-indigo-600 hover:bg-indigo-500 text-white rounded-2xl font-black text-sm tracking-widest uppercase transition-all shadow-2xl shadow-indigo-600/40 active:scale-95 flex items-center justify-center gap-4 group"
             >
-              Start Neural Scan <i className="fas fa-bolt group-hover:translate-x-1 transition-transform"></i>
+              Start Resume Review <i className="fas fa-arrow-right group-hover:translate-x-1 transition-transform"></i>
             </button>
             <button className="w-full sm:w-auto px-10 py-5 glass hover:bg-white/10 text-white rounded-2xl font-black text-sm tracking-widest uppercase transition-all flex items-center justify-center gap-4">
-              Explore Alpha <i className="fas fa-terminal"></i>
+              Learn More <i className="fas fa-info-circle"></i>
             </button>
           </div>
         </div>
 
-        {/* Feature Grid with Bento-ish style */}
+        {/* Feature Grid */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           {[
             {
-              icon: "fa-shield-halved",
-              title: "ATS Cryptography",
-              desc: "Mapping your resume against proprietary recruiter ranking algorithms used by global tech leaders.",
+              icon: "fa-certificate",
+              title: "Resume Performance",
+              desc: "Aligning your professional profile with top-tier recruitment standards and ATS requirements.",
               color: "border-indigo-500/20"
             },
             {
-              icon: "fa-satellite-dish",
-              title: "Live Simulation",
-              desc: "High-latency neural mock sessions via voice, video, or encrypted text to sharpen technical delivery.",
+              icon: "fa-comments",
+              title: "Guided Simulations",
+              desc: "Professional mock sessions via voice, video, or text to refine your delivery and technical accuracy.",
               color: "border-emerald-500/20"
             },
             {
-              icon: "fa-dna",
-              title: "Skill Roadmaps",
-              desc: "Evolutionary growth paths generated from the gaps in your technical DNA and communication style.",
+              icon: "fa-chart-line",
+              title: "Career Strategy",
+              desc: "Personalized roadmaps built to address specific experience gaps and accelerate your professional growth.",
               color: "border-purple-500/20"
             }
           ].map((f, i) => (
