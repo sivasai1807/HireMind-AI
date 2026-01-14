@@ -60,18 +60,20 @@ const App: React.FC = () => {
     navigate('dashboard');
   };
 
-  const handleEvaluationComplete = (evalData: InterviewEvaluation, transcript: Message[]) => {
+  const handleEvaluationComplete = (evalData: InterviewEvaluation, transcript: Message[], currentRole: string, currentStack: string) => {
     const newSession: SavedInterview = {
       id: crypto.randomUUID(),
       timestamp: Date.now(),
-      jobRole,
-      techStack,
+      jobRole: currentRole || jobRole,
+      techStack: currentStack || techStack,
       transcript,
       evaluation: evalData
     };
     
     setInterviewHistory(prev => [newSession, ...prev]);
     setActiveInterview(newSession);
+    // Sync the global role if it was empty
+    if (!jobRole && currentRole) setJobRole(currentRole);
     navigate('dashboard');
   };
 
@@ -88,9 +90,9 @@ const App: React.FC = () => {
           
           <nav className="hidden lg:flex items-center gap-10">
             {[
-              { id: 'resume', label: 'Resume Prep' },
-              { id: 'interview', label: 'Interviews' },
-              { id: 'dashboard', label: 'Performance Records' }
+              { id: 'resume', label: 'Resume Review' },
+              { id: 'interview', label: 'Mock Interviews' },
+              { id: 'dashboard', label: 'Career Dashboard' }
             ].map((v) => (
               <button 
                 key={v.id}
@@ -104,10 +106,10 @@ const App: React.FC = () => {
 
           <div className="flex items-center gap-6">
             <button onClick={() => navigate('resume')} className="hidden sm:block px-6 py-3 bg-white/5 hover:bg-white/10 text-white rounded-xl text-[10px] font-black uppercase tracking-widest transition-all">
-              Resume Analysis
+              Analysis
             </button>
             <button onClick={() => navigate('interview')} className="px-6 py-3 bg-indigo-600 hover:bg-indigo-500 text-white rounded-xl text-[10px] font-black uppercase tracking-widest transition-all shadow-xl shadow-indigo-600/20 active:scale-95">
-              Practice Interview
+              Practice Now
             </button>
           </div>
         </div>
@@ -116,15 +118,19 @@ const App: React.FC = () => {
       <main className="flex-grow">
         {view === 'landing' && <LandingPage onStartResume={() => navigate('resume')} onNavigate={navigate} />}
         {view === 'resume' && <ResumeTool onAnalysisComplete={handleResumeAnalysisComplete} setResumeText={setResumeText} />}
-        {view === 'interview' && <InterviewTool jobRole={jobRole} techStack={techStack} setTechStack={setTechStack} onEvaluationComplete={handleEvaluationComplete} />}
+        {view === 'interview' && (
+          <InterviewTool 
+            initialJobRole={jobRole} 
+            initialTechStack={techStack} 
+            onEvaluationComplete={handleEvaluationComplete} 
+          />
+        )}
         {view === 'dashboard' && (
           <Dashboard 
             activeResume={activeResume}
             resumeHistory={resumeHistory}
             activeInterview={activeInterview}
             interviewHistory={interviewHistory}
-            jobRole={jobRole}
-            techStack={techStack}
             onStartInterview={() => navigate('interview')}
             onGenerateRoadmap={() => navigate('roadmap')}
             onSelectSession={setActiveInterview}
@@ -135,7 +141,7 @@ const App: React.FC = () => {
         )}
         {view === 'roadmap' && (
           <RoadmapView 
-            jobRole={jobRole} 
+            jobRole={jobRole || activeInterview?.jobRole || 'Professional Role'} 
             atsAnalysis={activeResume} 
             evaluation={activeInterview?.evaluation || null} 
             roadmap={''} 
@@ -147,14 +153,14 @@ const App: React.FC = () => {
       <footer className="border-t border-white/5 py-16 bg-[#030712]/40">
         <div className="max-w-7xl mx-auto px-6 text-center">
           <div className="text-2xl font-black mb-4">HireMind</div>
-          <p className="text-slate-500 text-sm max-w-md mx-auto mb-10 font-medium">Empowering your professional journey with high-fidelity performance analysis and career strategy.</p>
+          <p className="text-slate-500 text-sm max-w-md mx-auto mb-10 font-medium">Precision tools for modern career development and recruitment readiness.</p>
           <div className="flex justify-center gap-8 mb-12">
             {['linkedin', 'twitter', 'github'].map(social => (
               <i key={social} className={`fab fa-${social} text-slate-500 hover:text-white text-xl cursor-pointer transition-colors`}></i>
             ))}
           </div>
           <div className="text-[10px] font-bold text-slate-700 uppercase tracking-[0.3em]">
-            &copy; {new Date().getFullYear()} HireMind Career Systems. Professional excellence guaranteed.
+            &copy; {new Date().getFullYear()} HireMind Career Systems. Built for professional growth.
           </div>
         </div>
       </footer>

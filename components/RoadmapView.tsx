@@ -17,13 +17,13 @@ const RoadmapView: React.FC<Props> = ({ jobRole, atsAnalysis, evaluation, roadma
   const generate = async () => {
     setLoading(true);
     try {
-      const resumeGaps = atsAnalysis?.improvement_suggestions.join(', ') || 'No resume gaps identified';
+      const resumeGaps = atsAnalysis?.improvement_suggestions.join(', ') || 'No specific gaps identified';
       const interviewGaps = evaluation?.weaknesses.join(', ') || 'No interview weaknesses identified';
       const result = await gemini.generateRoadmap(jobRole, resumeGaps, interviewGaps);
       setRoadmap(result);
     } catch (error) {
       console.error(error);
-      alert("Strategic planning failed. Please try again later.");
+      alert("Failed to generate career strategy. Please try again.");
     } finally {
       setLoading(false);
     }
@@ -39,12 +39,12 @@ const RoadmapView: React.FC<Props> = ({ jobRole, atsAnalysis, evaluation, roadma
     <div className="max-w-5xl mx-auto px-6 py-12">
       <div className="glass rounded-[3rem] p-10 md:p-14 relative overflow-hidden">
         <div className="absolute top-0 right-0 p-12 opacity-5 pointer-events-none">
-           <i className="fas fa-map text-[15rem] -rotate-12"></i>
+           <i className="fas fa-road text-[15rem] -rotate-12"></i>
         </div>
 
         <div className="flex flex-col md:flex-row items-center justify-between mb-16 gap-8 relative z-10">
           <div>
-            <h2 className="text-4xl font-black text-white tracking-tighter mb-2">30-Day Success Roadmap</h2>
+            <h2 className="text-4xl font-black text-white tracking-tighter mb-2">Career Roadmap</h2>
             <p className="text-slate-500 text-sm font-bold uppercase tracking-widest flex items-center gap-2">
               <span className="text-indigo-400">Target Role:</span> {jobRole}
             </p>
@@ -54,30 +54,30 @@ const RoadmapView: React.FC<Props> = ({ jobRole, atsAnalysis, evaluation, roadma
             disabled={loading}
             className="px-8 py-4 glass hover:bg-white/10 text-white text-[10px] font-black uppercase tracking-[0.2em] rounded-2xl transition-all disabled:opacity-50 active:scale-95 flex items-center gap-3"
           >
-            {loading ? <i className="fas fa-circle-notch animate-spin"></i> : <i className="fas fa-arrows-rotate"></i>}
-            Update Strategy
+            {loading ? <i className="fas fa-circle-notch animate-spin"></i> : <i className="fas fa-sync"></i>}
+            Refresh Strategy
           </button>
         </div>
 
         {loading ? (
           <div className="flex flex-col items-center justify-center py-32 gap-6 animate-pulse">
             <div className="w-20 h-20 bg-indigo-600/20 rounded-full flex items-center justify-center text-indigo-400 text-3xl">
-               <i className="fas fa-briefcase animate-bounce"></i>
+               <i className="fas fa-map-marked-alt animate-bounce"></i>
             </div>
             <div className="text-center">
-               <p className="text-white font-bold text-lg mb-1">Preparing Career Strategy...</p>
-               <p className="text-slate-500 text-sm">Aligning your professional goals with industry benchmarks.</p>
+               <p className="text-white font-bold text-lg mb-1">Building Your Career Plan...</p>
+               <p className="text-slate-500 text-sm">Organizing actionable steps for your professional growth.</p>
             </div>
           </div>
         ) : !roadmap ? (
           <div className="text-center py-32 glass border-dashed border-white/10 rounded-[2rem]">
-            <i className="fas fa-lock text-slate-700 text-5xl mb-6"></i>
-            <p className="text-slate-500 mb-8 max-w-sm mx-auto">Insufficient performance data. Complete a resume review or mock session to unlock your personalized strategy.</p>
+            <i className="fas fa-info-circle text-slate-700 text-5xl mb-6"></i>
+            <p className="text-slate-500 mb-8 max-w-sm mx-auto">Please complete a resume review or mock interview session to unlock your personalized roadmap.</p>
             <button 
               onClick={generate}
               className="px-10 py-4 bg-indigo-600 text-white rounded-2xl font-black text-xs uppercase tracking-widest"
             >
-              Generate Strategy
+              Generate Roadmap
             </button>
           </div>
         ) : (

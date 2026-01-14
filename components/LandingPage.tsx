@@ -9,81 +9,93 @@ interface Props {
 
 const LandingPage: React.FC<Props> = ({ onStartResume, onNavigate }) => {
   return (
-    <div className="relative pt-20 pb-32">
+    <div className="relative pt-16 pb-32 overflow-hidden">
+      {/* Hero Visual Elements */}
+      <div className="absolute top-20 left-1/2 -translate-x-1/2 w-[800px] h-[400px] bg-indigo-600/10 blur-[120px] rounded-full -z-10"></div>
+      
       <div className="max-w-7xl mx-auto px-6">
         <div className="flex flex-col items-center text-center">
-          <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full glass border border-indigo-500/20 text-indigo-400 text-xs font-bold uppercase tracking-widest mb-10 animate-in fade-in slide-in-from-top-4 duration-700">
-            <span className="w-2 h-2 rounded-full bg-indigo-500 animate-pulse"></span>
-            Professional Career Excellence
+          <div className="inline-flex items-center gap-3 px-5 py-2.5 rounded-full glass border border-indigo-500/20 text-indigo-400 text-xs font-black uppercase tracking-[0.2em] mb-12 animate-in fade-in slide-in-from-top-6 duration-700">
+            <span className="relative flex h-2.5 w-2.5">
+              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-indigo-400 opacity-75"></span>
+              <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-indigo-500"></span>
+            </span>
+            Professional Career Development
           </div>
           
-          <h1 className="text-6xl md:text-8xl font-extrabold tracking-tighter text-white mb-8 leading-[0.9] animate-in fade-in slide-in-from-bottom-4 duration-1000">
-            Master Your <br />
+          <h1 className="text-7xl md:text-9xl font-black tracking-tighter text-white mb-10 leading-[0.85] animate-in fade-in slide-in-from-bottom-6 duration-1000">
+            Secure Your <br />
             <span className="text-transparent bg-clip-text bg-gradient-to-r from-indigo-400 via-emerald-400 to-indigo-500">
-              Professional Path.
+              Next Career Step.
             </span>
           </h1>
           
-          <p className="text-lg md:text-xl text-slate-400 max-w-2xl mx-auto mb-12 leading-relaxed animate-in fade-in slide-in-from-bottom-8 duration-1000 delay-150">
-            Stop guessing. HireMind provides a professional framework for resume optimization and high-stakes interview readiness designed by recruitment experts.
+          <p className="text-xl md:text-2xl text-slate-400 max-w-3xl mx-auto mb-16 leading-relaxed font-medium animate-in fade-in slide-in-from-bottom-10 duration-1000 delay-150">
+            HireMind provides an advanced platform for resume optimization and realistic mock interviews designed to help you land top-tier roles.
           </p>
           
-          <div className="flex flex-col sm:flex-row items-center justify-center gap-6 mb-24 w-full sm:w-auto animate-in fade-in slide-in-from-bottom-12 duration-1000 delay-300">
+          <div className="flex flex-col sm:flex-row items-center justify-center gap-6 mb-32 w-full sm:w-auto animate-in fade-in slide-in-from-bottom-14 duration-1000 delay-300">
             <button 
               onClick={onStartResume}
-              className="w-full sm:w-auto px-10 py-5 bg-indigo-600 hover:bg-indigo-500 text-white rounded-2xl font-black text-sm tracking-widest uppercase transition-all shadow-2xl shadow-indigo-600/40 active:scale-95 flex items-center justify-center gap-4 group"
+              className="w-full sm:w-auto px-12 py-6 bg-indigo-600 hover:bg-indigo-500 text-white rounded-[2rem] font-black text-sm tracking-[0.2em] uppercase transition-all shadow-2xl shadow-indigo-600/40 active:scale-95 flex items-center justify-center gap-5 group"
             >
-              Start Resume Review <i className="fas fa-arrow-right group-hover:translate-x-1 transition-transform"></i>
+              Analyze Resume <i className="fas fa-chevron-right group-hover:translate-x-1.5 transition-transform text-xs"></i>
             </button>
             <button 
               onClick={() => onNavigate('dashboard')}
-              className="w-full sm:w-auto px-10 py-5 glass hover:bg-white/10 text-white rounded-2xl font-black text-sm tracking-widest uppercase transition-all flex items-center justify-center gap-4"
+              className="w-full sm:w-auto px-12 py-6 glass hover:bg-white/10 text-white rounded-[2rem] font-black text-sm tracking-[0.2em] uppercase transition-all flex items-center justify-center gap-5 group"
             >
-              Performance Insights <i className="fas fa-chart-pie"></i>
+              Learn More <i className="fas fa-arrow-right text-xs text-indigo-400 group-hover:translate-x-1 transition-transform"></i>
             </button>
           </div>
         </div>
 
         {/* Feature Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
           {[
             {
               id: 'resume',
-              icon: "fa-certificate",
-              title: "Resume Performance",
-              desc: "Aligning your professional profile with top-tier recruitment standards and ATS requirements.",
-              color: "border-indigo-500/20"
+              icon: "fa-file-signature",
+              title: "Resume Review",
+              desc: "Get detailed feedback on your resume based on current industry benchmarks and ATS requirements.",
+              accent: "border-indigo-500/20",
+              iconColor: "text-indigo-400"
             },
             {
               id: 'interview',
               icon: "fa-comments",
-              title: "Guided Simulations",
-              desc: "Professional mock sessions via voice, video, or text to refine your delivery and technical accuracy.",
-              color: "border-emerald-500/20"
+              title: "Mock Interviews",
+              desc: "Practice with realistic mock interviews in voice, video, or text modes with professional feedback.",
+              accent: "border-emerald-500/20",
+              iconColor: "text-emerald-400"
             },
             {
               id: 'roadmap',
-              icon: "fa-chart-line",
-              title: "Career Strategy",
-              desc: "Personalized roadmaps built to address specific experience gaps and accelerate your professional growth.",
-              color: "border-purple-500/20"
+              icon: "fa-road",
+              title: "Career Roadmap",
+              desc: "Recieve a personalized 30-day action plan to address your specific skill gaps and career goals.",
+              accent: "border-purple-500/20",
+              iconColor: "text-purple-400"
             }
           ].map((f, i) => (
             <div 
               key={i} 
               onClick={() => onNavigate(f.id as AppView)}
-              className={`p-10 glass rounded-3xl border-2 ${f.color} hover:bg-white/5 cursor-pointer transition-all hover:-translate-y-2 group relative overflow-hidden`}
+              className={`p-12 glass rounded-[3rem] border-2 ${f.accent} hover:bg-white/5 cursor-pointer transition-all hover:-translate-y-3 group relative overflow-hidden`}
             >
-              <div className="absolute -right-4 -bottom-4 text-white/5 text-8xl transition-all group-hover:scale-110 group-hover:text-white/10">
+              <div className="absolute -right-8 -bottom-8 text-white/[0.03] text-[12rem] transition-all group-hover:scale-110 group-hover:text-white/[0.06] -rotate-12">
                 <i className={`fas ${f.icon}`}></i>
               </div>
-              <div className="w-14 h-14 rounded-2xl bg-white/5 flex items-center justify-center text-white text-2xl mb-8 group-hover:bg-indigo-600 transition-all">
+              
+              <div className={`w-16 h-16 rounded-2xl bg-white/5 flex items-center justify-center ${f.iconColor} text-3xl mb-10 group-hover:bg-indigo-600 group-hover:text-white transition-all shadow-inner`}>
                 <i className={`fas ${f.icon}`}></i>
               </div>
-              <h3 className="text-xl font-black mb-4 uppercase tracking-tight text-white">{f.title}</h3>
-              <p className="text-slate-400 leading-relaxed text-sm">{f.desc}</p>
-              <div className="mt-8 flex items-center gap-2 text-[10px] font-black uppercase tracking-widest text-indigo-400 opacity-0 group-hover:opacity-100 transition-opacity">
-                Launch Module <i className="fas fa-arrow-right text-[8px]"></i>
+              
+              <h3 className="text-2xl font-black mb-5 uppercase tracking-tight text-white">{f.title}</h3>
+              <p className="text-slate-400 leading-relaxed text-base font-medium mb-10">{f.desc}</p>
+              
+              <div className="flex items-center gap-3 text-[11px] font-black uppercase tracking-[0.25em] text-indigo-400 opacity-60 group-hover:opacity-100 transition-opacity">
+                Get Started <i className="fas fa-arrow-right-long text-[10px]"></i>
               </div>
             </div>
           ))}
