@@ -3,9 +3,9 @@ import React, { useState, useCallback, useEffect } from 'react';
 import LandingPage from './components/LandingPage';
 import ResumeTool from './components/ResumeTool';
 import InterviewTool from './components/InterviewTool';
+import LearningPathTool from './components/LearningPathTool';
 import Dashboard from './components/Dashboard';
-import RoadmapView from './components/RoadmapView';
-import { AppView, AtsAnalysis, InterviewEvaluation, Message, SavedInterview, SavedResumeAnalysis } from './types';
+import { AppView, AtsAnalysis, InterviewEvaluation, Message, SavedInterview, SavedResumeAnalysis, LearningRoadmap } from './types';
 
 const App: React.FC = () => {
   const [view, setView] = useState<AppView>('landing');
@@ -15,6 +15,7 @@ const App: React.FC = () => {
   
   const HISTORY_KEY = 'hiremind_history';
   const RESUME_HISTORY_KEY = 'hiremind_resume_history';
+  const ROADMAP_HISTORY_KEY = 'hiremind_roadmap_history';
 
   const [resumeHistory, setResumeHistory] = useState<SavedResumeAnalysis[]>(() => {
     const saved = localStorage.getItem(RESUME_HISTORY_KEY);
@@ -34,6 +35,15 @@ const App: React.FC = () => {
     interviewHistory.length > 0 ? interviewHistory[0] : null
   );
 
+  const [roadmapHistory, setRoadmapHistory] = useState<LearningRoadmap[]>(() => {
+    const saved = localStorage.getItem(ROADMAP_HISTORY_KEY);
+    return saved ? JSON.parse(saved) : [];
+  });
+
+  const [activeRoadmap, setActiveRoadmap] = useState<LearningRoadmap | null>(
+    roadmapHistory.length > 0 ? roadmapHistory[0] : null
+  );
+
   useEffect(() => {
     localStorage.setItem(HISTORY_KEY, JSON.stringify(interviewHistory));
   }, [interviewHistory]);
@@ -41,6 +51,10 @@ const App: React.FC = () => {
   useEffect(() => {
     localStorage.setItem(RESUME_HISTORY_KEY, JSON.stringify(resumeHistory));
   }, [resumeHistory]);
+
+  useEffect(() => {
+    localStorage.setItem(ROADMAP_HISTORY_KEY, JSON.stringify(roadmapHistory));
+  }, [roadmapHistory]);
 
   const navigate = useCallback((newView: AppView) => {
     setView(newView);
@@ -72,9 +86,14 @@ const App: React.FC = () => {
     
     setInterviewHistory(prev => [newSession, ...prev]);
     setActiveInterview(newSession);
-    // Sync the global role if it was empty
     if (!jobRole && currentRole) setJobRole(currentRole);
     navigate('dashboard');
+  };
+
+  const handleRoadmapComplete = (roadmap: LearningRoadmap) => {
+    setRoadmapHistory(prev => [roadmap, ...prev]);
+    setActiveRoadmap(roadmap);
+    // Don't auto-navigate to dashboard yet, let the user enjoy the roadmap view
   };
 
   return (
@@ -92,7 +111,8 @@ const App: React.FC = () => {
             {[
               { id: 'resume', label: 'Resume Review' },
               { id: 'interview', label: 'Mock Interviews' },
-              { id: 'dashboard', label: 'Career Dashboard' }
+              { id: 'learning-path', label: 'Learning Path' },
+              { id: 'dashboard', label: 'Dashboard' }
             ].map((v) => (
               <button 
                 key={v.id}
@@ -105,8 +125,8 @@ const App: React.FC = () => {
           </nav>
 
           <div className="flex items-center gap-6">
-            <button onClick={() => navigate('resume')} className="hidden sm:block px-6 py-3 bg-white/5 hover:bg-white/10 text-white rounded-xl text-[10px] font-black uppercase tracking-widest transition-all">
-              Analysis
+            <button onClick={() => navigate('learning-path')} className="hidden sm:block px-6 py-3 bg-white/5 hover:bg-white/10 text-white rounded-xl text-[10px] font-black uppercase tracking-widest transition-all">
+              Pathways
             </button>
             <button onClick={() => navigate('interview')} className="px-6 py-3 bg-indigo-600 hover:bg-indigo-500 text-white rounded-xl text-[10px] font-black uppercase tracking-widest transition-all shadow-xl shadow-indigo-600/20 active:scale-95">
               Practice Now
@@ -125,27 +145,25 @@ const App: React.FC = () => {
             onEvaluationComplete={handleEvaluationComplete} 
           />
         )}
+        {view === 'learning-path' && (
+          <LearningPathTool onRoadmapComplete={handleRoadmapComplete} />
+        )}
         {view === 'dashboard' && (
           <Dashboard 
             activeResume={activeResume}
             resumeHistory={resumeHistory}
             activeInterview={activeInterview}
             interviewHistory={interviewHistory}
+            activeRoadmap={activeRoadmap}
+            roadmapHistory={roadmapHistory}
             onStartInterview={() => navigate('interview')}
-            onGenerateRoadmap={() => navigate('roadmap')}
+            onGenerateRoadmap={() => navigate('learning-path')}
             onSelectSession={setActiveInterview}
             onDeleteSession={(id) => setInterviewHistory(h => h.filter(x => x.id !== id))}
             onSelectResume={setActiveResume}
             onDeleteResume={(id) => setResumeHistory(h => h.filter(x => x.id !== id))}
-          />
-        )}
-        {view === 'roadmap' && (
-          <RoadmapView 
-            jobRole={jobRole || activeInterview?.jobRole || 'Professional Role'} 
-            atsAnalysis={activeResume} 
-            evaluation={activeInterview?.evaluation || null} 
-            roadmap={''} 
-            setRoadmap={() => {}} 
+            onSelectRoadmap={setActiveRoadmap}
+            onDeleteRoadmap={(id) => setRoadmapHistory(h => h.filter(x => x.id !== id))}
           />
         )}
       </main>

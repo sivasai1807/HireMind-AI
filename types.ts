@@ -40,10 +40,29 @@ export interface SavedInterview {
   evaluation: InterviewEvaluation;
 }
 
-export interface SkillGap {
-  missing_core_skills: string[];
-  weak_fundamentals: string[];
-  suggested_focus_areas: string[];
+export interface LearningRoadmap {
+  id: string;
+  timestamp: number;
+  field: string;
+  goal: string;
+  estimated_days: number;
+  milestones: Array<{
+    week: number;
+    topic: string;
+    description: string;
+    tasks: string[];
+    resources: Array<{ title: string; url: string }>;
+  }>;
+  project_suggestions: Array<{
+    name: string;
+    description: string;
+    tech_stack: string[];
+  }>;
+  hiring_companies: Array<{
+    name: string;
+    industry: string;
+    typical_roles: string[];
+  }>;
 }
 
-export type AppView = 'landing' | 'resume' | 'interview' | 'dashboard' | 'roadmap';
+export type AppView = 'landing' | 'resume' | 'interview' | 'dashboard' | 'learning-path';

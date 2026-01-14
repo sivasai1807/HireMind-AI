@@ -1,6 +1,6 @@
 
 import { GoogleGenAI, Type, GenerateContentResponse } from "@google/genai";
-import { AtsAnalysis, InterviewEvaluation } from "../types";
+import { AtsAnalysis, InterviewEvaluation, LearningRoadmap } from "../types";
 
 const SYSTEM_PERSONALITY = `You are a Senior Executive Career Coach and Talent Acquisition Specialist with over 20 years of experience at top-tier global firms. 
 Your tone is professional, insightful, and direct. You provide high-level constructive feedback that helps candidates excel in competitive hiring environments.
@@ -37,18 +37,6 @@ export class GeminiService {
         config: { systemInstruction: SYSTEM_PERSONALITY, responseMimeType: 'application/json' }
       });
       return JSON.parse(response.text || '{}') as AtsAnalysis;
-    });
-  }
-
-  async rewriteResume(jobRole: string, resumeText: string): Promise<string> {
-    return this.safeCall(async () => {
-      const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
-      const response = await ai.models.generateContent({
-        model: 'gemini-3-flash-preview',
-        contents: `As an expert resume writer, optimize the following profile for a ${jobRole} role. Focus on impact and industry-standard keywords:\n${resumeText}`,
-        config: { systemInstruction: SYSTEM_PERSONALITY }
-      });
-      return response.text || '';
     });
   }
 
@@ -89,15 +77,23 @@ export class GeminiService {
     });
   }
 
-  async generateRoadmap(role: string, resumeGaps: string, interviewGaps: string): Promise<string> {
+  async generateCustomRoadmap(field: string, goal: string): Promise<Partial<LearningRoadmap>> {
     return this.safeCall(async () => {
       const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
+      const prompt = `Create a highly detailed, professional career roadmap for the field: ${field}. User's Goal: ${goal}.
+      You MUST return valid JSON with these keys:
+      estimated_days: number,
+      milestones: Array of objects { week: number, topic: string, description: string, tasks: string[], resources: Array of objects {title, url} },
+      project_suggestions: Array of objects { name, description, tech_stack: string[] },
+      hiring_companies: Array of objects { name, industry, typical_roles: string[] }.
+      Ensure the plan is logical, comprehensive, and helpful for professional growth. Use credible-sounding resource URLs if possible.`;
+      
       const response = await ai.models.generateContent({
         model: 'gemini-3-flash-preview',
-        contents: `Create a structured 30-day professional development plan for a ${role} role based on these focus areas:\nResume Gaps: ${resumeGaps}\nInterview Performance Gaps: ${interviewGaps}. Organize the plan by week with actionable milestones.`,
-        config: { systemInstruction: SYSTEM_PERSONALITY }
+        contents: prompt,
+        config: { systemInstruction: SYSTEM_PERSONALITY, responseMimeType: 'application/json' }
       });
-      return response.text || '';
+      return JSON.parse(response.text || '{}') as Partial<LearningRoadmap>;
     });
   }
 }
