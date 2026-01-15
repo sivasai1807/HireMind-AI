@@ -107,46 +107,34 @@ const App: React.FC = () => {
             <span>HireMind</span>
           </button>
           
-          <nav className="hidden xl:flex items-center gap-10">
+          <nav className="hidden lg:flex items-center gap-2">
             {[
               { id: 'resume', label: 'Resume Audit' },
-              { id: 'interview', label: 'Mock Interview' },
-              { id: 'learning-path', label: 'Career Strategy' }
+              { id: 'interview', label: 'Interview Lab' },
+              { id: 'learning-path', label: 'Career Strategy' },
+              { id: 'dashboard', label: 'Success Board' }
             ].map((v) => (
               <button 
                 key={v.id}
                 onClick={() => navigate(v.id as AppView)} 
-                className={`text-[10px] font-black uppercase tracking-[0.25em] transition-all hover:text-white relative group py-2 ${view === v.id ? 'text-indigo-400' : 'text-slate-500'}`}
+                className={`px-5 py-2 rounded-xl text-[10px] font-black uppercase tracking-[0.2em] transition-all relative group ${view === v.id ? 'bg-indigo-600/10 text-indigo-400' : 'text-slate-500 hover:text-white hover:bg-white/5'}`}
               >
                 {v.label}
-                <span className={`absolute bottom-0 left-0 h-0.5 bg-indigo-500 transition-all duration-300 ${view === v.id ? 'w-full' : 'w-0 group-hover:w-full'}`}></span>
               </button>
             ))}
           </nav>
 
           <div className="flex items-center gap-4">
-            <button 
-              onClick={() => navigate('dashboard')} 
-              className={`flex items-center gap-3 px-5 py-3 rounded-xl transition-all ${view === 'dashboard' ? 'bg-indigo-600/20 text-indigo-400 border border-indigo-500/30' : 'bg-white/5 hover:bg-white/10 text-slate-400'}`}
-            >
-              <i className="fas fa-chart-line text-sm"></i>
-              <span className="hidden lg:inline text-[9px] font-black uppercase tracking-widest">Dashboard</span>
-            </button>
-            
-            <div className="w-px h-8 bg-white/10 mx-1 hidden sm:block"></div>
-
-            <button 
-              onClick={() => navigate('resume')} 
-              className="hidden sm:flex items-center gap-3 px-6 py-3 bg-white/5 hover:bg-white/10 text-white rounded-xl text-[10px] font-black uppercase tracking-widest transition-all border border-white/5"
-            >
-              Audit Resume
-            </button>
+            <div className="hidden sm:flex items-center gap-2 px-4 py-2 rounded-lg bg-emerald-500/10 border border-emerald-500/20">
+              <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
+              <span className="text-[9px] font-black text-emerald-400 uppercase tracking-widest">AI Agent Online</span>
+            </div>
             
             <button 
-              onClick={() => navigate('interview')} 
-              className="px-6 py-3 bg-indigo-600 hover:bg-indigo-500 text-white rounded-xl text-[10px] font-black uppercase tracking-widest transition-all shadow-xl shadow-indigo-600/20 active:scale-95"
+              onClick={() => navigate('landing')} 
+              className="lg:hidden w-10 h-10 rounded-xl bg-white/5 flex items-center justify-center text-slate-400 hover:bg-white/10"
             >
-              Start Practice
+              <i className="fas fa-bars"></i>
             </button>
           </div>
         </div>
@@ -192,15 +180,15 @@ const App: React.FC = () => {
               <i className="fas fa-briefcase"></i>
             </div>
           </div>
-          <div className="text-2xl font-black mb-4 tracking-tighter">HireMind</div>
-          <p className="text-slate-500 text-sm max-w-md mx-auto mb-10 font-medium">Precision tools for modern career development and FAANG-level recruitment readiness.</p>
+          <div className="text-2xl font-black mb-4 tracking-tighter">HireMind AI</div>
+          <p className="text-slate-500 text-sm max-w-md mx-auto mb-10 font-medium">Precision-engineered tools for high-performance career trajectory management and FAANG-level readiness.</p>
           <div className="flex justify-center gap-8 mb-12">
             {['linkedin', 'twitter', 'github'].map(social => (
               <i key={social} className={`fab fa-${social} text-slate-500 hover:text-white text-xl cursor-pointer transition-colors`}></i>
             ))}
           </div>
           <div className="text-[10px] font-bold text-slate-700 uppercase tracking-[0.3em]">
-            &copy; {new Date().getFullYear()} HireMind Career Systems. Professional Growth Excellence.
+            &copy; {new Date().getFullYear()} HireMind AI Systems. All Rights Reserved.
           </div>
         </div>
       </footer>

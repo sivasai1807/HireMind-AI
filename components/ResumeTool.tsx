@@ -130,6 +130,25 @@ const ResumeTool: React.FC<Props> = ({ onAnalysisComplete, setResumeText }) => {
                   </div>
                </section>
 
+               {/* New Project Feedback Section */}
+               {analysisResult.project_feedback && analysisResult.project_feedback.length > 0 && (
+                 <section className="space-y-8">
+                    <h5 className="text-[10px] font-black uppercase tracking-[0.4em] text-indigo-300 px-2 flex items-center gap-3">
+                      <i className="fas fa-rocket"></i> Project Portfolio Insights
+                    </h5>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                      {analysisResult.project_feedback.map((feedback, i) => (
+                        <div key={i} className="p-8 glass rounded-[2.5rem] border-indigo-500/10 hover:bg-white/5 transition-all group flex gap-6">
+                          <div className="w-12 h-12 rounded-2xl bg-indigo-600/10 flex items-center justify-center text-indigo-400 shrink-0 group-hover:scale-110 transition-transform">
+                            <i className="fas fa-folder-open"></i>
+                          </div>
+                          <p className="text-sm text-slate-300 leading-relaxed font-medium">{feedback}</p>
+                        </div>
+                      ))}
+                    </div>
+                 </section>
+               )}
+
                <section className="space-y-8">
                   <h5 className="text-[10px] font-black uppercase tracking-[0.4em] text-emerald-400 px-2">Strategic Improvement Logic</h5>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
