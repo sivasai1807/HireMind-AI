@@ -93,7 +93,6 @@ const App: React.FC = () => {
   const handleRoadmapComplete = (roadmap: LearningRoadmap) => {
     setRoadmapHistory(prev => [roadmap, ...prev]);
     setActiveRoadmap(roadmap);
-    // Don't auto-navigate to dashboard yet, let the user enjoy the roadmap view
   };
 
   return (
@@ -109,10 +108,10 @@ const App: React.FC = () => {
           
           <nav className="hidden lg:flex items-center gap-10">
             {[
-              { id: 'resume', label: 'Resume Review' },
-              { id: 'interview', label: 'Mock Interviews' },
-              { id: 'learning-path', label: 'Learning Path' },
-              { id: 'dashboard', label: 'Dashboard' }
+              { id: 'resume', label: 'Resume Audit' },
+              { id: 'interview', label: 'Mock Interview' },
+              { id: 'learning-path', label: 'Career Roadmap' },
+              { id: 'dashboard', label: 'My Progress' }
             ].map((v) => (
               <button 
                 key={v.id}
@@ -125,11 +124,11 @@ const App: React.FC = () => {
           </nav>
 
           <div className="flex items-center gap-6">
-            <button onClick={() => navigate('learning-path')} className="hidden sm:block px-6 py-3 bg-white/5 hover:bg-white/10 text-white rounded-xl text-[10px] font-black uppercase tracking-widest transition-all">
-              Pathways
+            <button onClick={() => navigate('resume')} className="hidden sm:block px-6 py-3 bg-white/5 hover:bg-white/10 text-white rounded-xl text-[10px] font-black uppercase tracking-widest transition-all">
+              Analyze Resume
             </button>
             <button onClick={() => navigate('interview')} className="px-6 py-3 bg-indigo-600 hover:bg-indigo-500 text-white rounded-xl text-[10px] font-black uppercase tracking-widest transition-all shadow-xl shadow-indigo-600/20 active:scale-95">
-              Practice Now
+              Start Practice
             </button>
           </div>
         </div>

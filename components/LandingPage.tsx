@@ -42,10 +42,10 @@ const LandingPage: React.FC<Props> = ({ onStartResume, onNavigate }) => {
               Analyze Resume <i className="fas fa-chevron-right group-hover:translate-x-1.5 transition-transform text-xs"></i>
             </button>
             <button 
-              onClick={() => onNavigate('dashboard')}
+              onClick={() => onNavigate('learning-path')}
               className="w-full sm:w-auto px-12 py-6 glass hover:bg-white/10 text-white rounded-[2rem] font-black text-sm tracking-[0.2em] uppercase transition-all flex items-center justify-center gap-5 group"
             >
-              Learn More <i className="fas fa-arrow-right text-xs text-indigo-400 group-hover:translate-x-1 transition-transform"></i>
+              View Roadmaps <i className="fas fa-arrow-right text-xs text-indigo-400 group-hover:translate-x-1 transition-transform"></i>
             </button>
           </div>
         </div>
@@ -56,7 +56,7 @@ const LandingPage: React.FC<Props> = ({ onStartResume, onNavigate }) => {
             {
               id: 'resume',
               icon: "fa-file-signature",
-              title: "Resume Review",
+              title: "Resume Audit",
               desc: "Get detailed feedback on your resume based on current industry benchmarks and ATS requirements.",
               accent: "border-indigo-500/20",
               iconColor: "text-indigo-400"
@@ -70,10 +70,10 @@ const LandingPage: React.FC<Props> = ({ onStartResume, onNavigate }) => {
               iconColor: "text-emerald-400"
             },
             {
-              id: 'roadmap',
+              id: 'learning-path',
               icon: "fa-road",
               title: "Career Roadmap",
-              desc: "Recieve a personalized 30-day action plan to address your specific skill gaps and career goals.",
+              desc: "Receive a personalized action plan to address your specific skill gaps and career goals.",
               accent: "border-purple-500/20",
               iconColor: "text-purple-400"
             }
