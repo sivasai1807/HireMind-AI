@@ -102,7 +102,9 @@ const InterviewTool: React.FC<Props> = ({ initialJobRole, initialTechStack, onEv
   const stopLiveSession = () => {
     if (sessionRef.current) sessionRef.current.close();
     if (streamRef.current) streamRef.current.getTracks().forEach(t => t.stop());
-    if (audioContextRef.current) audioContextRef.current.close();
+    if (audioContextRef.current && audioContextRef.current.state !== 'closed') {
+      audioContextRef.current.close().catch(() => {});
+    }
     if (frameIntervalRef.current) window.clearInterval(frameIntervalRef.current);
     setIsLive(false);
   };
@@ -170,7 +172,7 @@ const InterviewTool: React.FC<Props> = ({ initialJobRole, initialTechStack, onEv
             }
             const audioData = message.serverContent?.modelTurn?.parts[0]?.inlineData?.data;
             if (audioData) {
-              const ctx = audioContextRef.current; if (!ctx) return;
+              const ctx = audioContextRef.current; if (!ctx || ctx.state === 'closed') return;
               nextStartTimeRef.current = Math.max(nextStartTimeRef.current, ctx.currentTime);
               const buffer = await decodeAudioData(decode(audioData), ctx, OUTPUT_SAMPLE_RATE, 1);
               const source = ctx.createBufferSource(); source.buffer = buffer; source.connect(ctx.destination);
@@ -252,9 +254,9 @@ const InterviewTool: React.FC<Props> = ({ initialJobRole, initialTechStack, onEv
       <div className="max-w-xl mx-auto px-6 py-24 text-center">
         <div className="glass rounded-[3rem] p-12 border-red-500/20">
           <div className="w-20 h-20 bg-red-500/10 rounded-full flex items-center justify-center mx-auto mb-8 text-red-500 text-3xl"><i className="fas fa-exclamation-circle"></i></div>
-          <h2 className="text-3xl font-black text-white mb-4">Service Unavailable</h2>
-          <p className="text-slate-400 mb-10 leading-relaxed">The interview service is currently at full capacity. Please try again in a few minutes.</p>
-          <button onClick={() => window.location.reload()} className="w-full py-5 bg-indigo-600 text-white rounded-2xl font-black text-xs uppercase tracking-widest transition-all">Retry</button>
+          <h2 className="text-3xl font-black text-white mb-4">Service Busy</h2>
+          <p className="text-slate-400 mb-10 leading-relaxed">The AI recruiter is currently managing other candidates. Please refresh or try again in 2-3 minutes.</p>
+          <button onClick={() => window.location.reload()} className="w-full py-5 bg-indigo-600 text-white rounded-2xl font-black text-xs uppercase tracking-widest transition-all">Retry Session</button>
         </div>
       </div>
     );
@@ -265,35 +267,35 @@ const InterviewTool: React.FC<Props> = ({ initialJobRole, initialTechStack, onEv
       <div className="max-w-4xl mx-auto px-6 py-12">
         <div className="glass rounded-[3rem] p-10 md:p-14 relative overflow-hidden">
           <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-indigo-500 via-emerald-500 to-indigo-500"></div>
-          <h2 className="text-4xl md:text-5xl font-black mb-4 text-white tracking-tighter">Mock Interview Setup</h2>
-          <p className="text-slate-400 mb-12 max-w-xl text-lg font-medium">Select your interview mode and focus area to begin your professional practice session.</p>
+          <h2 className="text-4xl md:text-5xl font-black mb-4 text-white tracking-tighter">Mock Interview Lab</h2>
+          <p className="text-slate-400 mb-12 max-w-xl text-lg font-medium">Configure your professional practice environment to begin a high-fidelity recruitment simulation.</p>
           
           <div className="space-y-12">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
               <div className="space-y-4">
-                <label className="text-[10px] font-black uppercase tracking-[0.3em] text-slate-500 ml-1">Target Job Role</label>
-                <input type="text" placeholder="e.g. Frontend Developer" className="w-full bg-black/40 border border-white/5 rounded-2xl px-6 py-4 outline-none focus:border-indigo-500/50 transition-all font-bold text-white shadow-inner" value={jobRole} onChange={(e) => setJobRole(e.target.value)} />
+                <label className="text-[10px] font-black uppercase tracking-[0.3em] text-slate-500 ml-1">Job Role</label>
+                <input type="text" placeholder="e.g. Lead Software Engineer" className="w-full bg-black/40 border border-white/5 rounded-2xl px-6 py-4 outline-none focus:border-indigo-500/50 transition-all font-bold text-white shadow-inner" value={jobRole} onChange={(e) => setJobRole(e.target.value)} />
               </div>
               <div className="space-y-4">
-                <label className="text-[10px] font-black uppercase tracking-[0.3em] text-slate-500 ml-1">Technology Focus</label>
-                <input type="text" placeholder="e.g. React, Python, AWS" className="w-full bg-black/40 border border-white/5 rounded-2xl px-6 py-4 outline-none focus:border-indigo-500/50 transition-all font-bold text-white shadow-inner" value={techStack} onChange={(e) => setTechStack(e.target.value)} />
+                <label className="text-[10px] font-black uppercase tracking-[0.3em] text-slate-500 ml-1">Tech Stack</label>
+                <input type="text" placeholder="e.g. TypeScript, Node, Kubernetes" className="w-full bg-black/40 border border-white/5 rounded-2xl px-6 py-4 outline-none focus:border-indigo-500/50 transition-all font-bold text-white shadow-inner" value={techStack} onChange={(e) => setTechStack(e.target.value)} />
               </div>
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
               <div className="space-y-4">
-                <label className="text-[10px] font-black uppercase tracking-[0.3em] text-slate-500 ml-1">Interview Mode</label>
+                <label className="text-[10px] font-black uppercase tracking-[0.3em] text-slate-500 ml-1">Practice Mode</label>
                 <div className="flex bg-black/40 border border-white/5 rounded-2xl p-1.5 gap-1.5">
                   {(['text', 'video'] as Mode[]).map((m) => (
                     <button key={m} onClick={() => setMode(m)} className={`flex-1 py-4 rounded-xl text-[9px] font-black uppercase tracking-widest transition-all ${mode === m ? 'bg-indigo-600 text-white shadow-xl scale-[1.02]' : 'text-slate-500 hover:text-white'}`}>
                       <i className={`fas fa-${m === 'text' ? 'keyboard' : 'video'} mb-1.5 block text-base`}></i>
-                      {m === 'text' ? 'Interactive Text' : 'Video Simulation'}
+                      {m === 'text' ? 'Text Interface' : 'Video Simulation'}
                     </button>
                   ))}
                 </div>
               </div>
               <div className="space-y-4">
-                <label className="text-[10px] font-black uppercase tracking-[0.3em] text-slate-500 ml-1">Seniority Level</label>
+                <label className="text-[10px] font-black uppercase tracking-[0.3em] text-slate-500 ml-1">Difficulty Level</label>
                 <div className="grid grid-cols-3 gap-2">
                   {difficultyOptions.map((opt) => (
                     <button key={opt.id} onClick={() => setDifficulty(opt.id)} className={`flex flex-col items-center justify-center p-3 rounded-2xl border-2 transition-all ${difficulty === opt.id ? `${opt.color} bg-indigo-500/5 border-current` : 'border-white/5 bg-black/20 hover:border-white/10 text-slate-500'}`}>
@@ -305,7 +307,7 @@ const InterviewTool: React.FC<Props> = ({ initialJobRole, initialTechStack, onEv
             </div>
 
             <button onClick={() => mode === 'text' ? startTextInterview() : startLiveSession(mode)} disabled={loading} className="w-full py-6 bg-indigo-600 hover:bg-indigo-500 text-white rounded-[1.5rem] font-black text-xs tracking-[0.3em] uppercase transition-all shadow-2xl shadow-indigo-600/30 active:scale-95 disabled:opacity-50">
-              {loading ? <><i className="fas fa-circle-notch animate-spin"></i> Initializing Session...</> : 'Start Professional Session'}
+              {loading ? <><i className="fas fa-circle-notch animate-spin mr-3"></i> Syncing Session...</> : 'Launch Session'}
             </button>
           </div>
         </div>
@@ -313,271 +315,114 @@ const InterviewTool: React.FC<Props> = ({ initialJobRole, initialTechStack, onEv
     );
   }
 
-  // Modern Text Mode Interface
-  if (mode === 'text') {
-    return (
-      <div className="h-[calc(100vh-80px)] flex flex-col md:flex-row bg-[#030712] relative animate-in fade-in duration-500">
-        {/* Left Info Panel - Professional Touch */}
-        <aside className="hidden lg:flex w-80 border-r border-white/5 bg-black/20 backdrop-blur-3xl flex-col p-8 space-y-10">
-          <div>
-            <h3 className="text-[10px] font-black uppercase tracking-[0.4em] text-slate-500 mb-6">Session Context</h3>
-            <div className="p-5 glass rounded-2xl border-indigo-500/20">
-              <div className="flex items-center gap-3 mb-4">
-                <div className="w-10 h-10 rounded-xl bg-indigo-600/10 flex items-center justify-center text-indigo-400">
-                  <i className="fas fa-briefcase text-sm"></i>
-                </div>
-                <div>
-                  <div className="text-[9px] font-black text-slate-600 uppercase tracking-widest">Role</div>
-                  <div className="text-xs font-bold text-white truncate max-w-[140px]">{jobRole}</div>
-                </div>
-              </div>
-              <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-xl bg-emerald-600/10 flex items-center justify-center text-emerald-400">
-                  <i className="fas fa-code text-sm"></i>
-                </div>
-                <div>
-                  <div className="text-[9px] font-black text-slate-600 uppercase tracking-widest">Skills</div>
-                  <div className="text-xs font-bold text-white truncate max-w-[140px]">{techStack}</div>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <div>
-            <h3 className="text-[10px] font-black uppercase tracking-[0.4em] text-slate-500 mb-6">Evaluation Criteria</h3>
-            <ul className="space-y-3">
-              {['Technical Depth', 'Communication', 'Clarity'].map(c => (
-                <li key={c} className="flex items-center gap-3 text-xs font-bold text-slate-400">
-                  <span className="w-1.5 h-1.5 rounded-full bg-indigo-500"></span> {c}
-                </li>
-              ))}
-            </ul>
-          </div>
-
-          <div className="mt-auto">
-            <button onClick={() => setIsConfirming(true)} className="w-full py-4 bg-rose-500/10 text-rose-500 hover:bg-rose-500/20 border border-rose-500/20 rounded-2xl text-[10px] font-black uppercase tracking-widest transition-all">
-              <i className="fas fa-door-open mr-2"></i> End Interview
-            </button>
-          </div>
-        </aside>
-
-        {/* Main Chat Area */}
-        <div className="flex-grow flex flex-col h-full bg-[#030712] relative">
-          <header className="h-20 glass border-b border-white/5 flex items-center justify-between px-8 z-20 shrink-0">
-            <div className="flex items-center gap-4">
-               <div className="w-12 h-12 rounded-2xl bg-indigo-600/10 border border-indigo-500/20 flex items-center justify-center text-indigo-400 shadow-xl shadow-indigo-600/10">
-                 <i className="fas fa-user-tie text-xl"></i>
-               </div>
-               <div>
-                  <h3 className="text-white text-base font-black tracking-tight">Executive Recruiter</h3>
-                  <span className="text-emerald-400 text-[9px] font-black uppercase tracking-widest flex items-center gap-2">
-                    <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
-                    Live Session Active
-                  </span>
-               </div>
-            </div>
-            <div className="flex items-center gap-4 lg:hidden">
-               <button onClick={() => setIsConfirming(true)} className="px-5 py-2.5 bg-rose-500/10 text-rose-500 rounded-xl text-[9px] font-black uppercase tracking-widest">End Session</button>
-            </div>
-          </header>
-
-          <div ref={scrollRef} className="flex-grow overflow-y-auto px-6 py-10 space-y-10 scrollbar-thin scrollbar-thumb-white/10 scroll-smooth">
-            {messages.length === 0 && !loading && (
-              <div className="flex flex-col items-center justify-center h-full text-center space-y-6 opacity-30">
-                <i className="fas fa-comments text-5xl"></i>
-                <p className="text-sm font-bold uppercase tracking-widest">Waiting for response...</p>
-              </div>
-            )}
-            
-            {messages.map((m, i) => (
-              <div key={i} className={`flex ${m.role === 'interviewer' ? 'justify-start' : 'justify-end'} animate-in fade-in slide-in-from-bottom-4 duration-500`}>
-                <div className={`group relative max-w-[85%] sm:max-w-[70%] p-6 rounded-[2rem] text-[15px] leading-relaxed transition-all shadow-2xl ${
-                  m.role === 'interviewer' 
-                  ? 'glass text-slate-200 rounded-tl-none border-l-4 border-l-indigo-500' 
-                  : 'bg-indigo-600 text-white rounded-tr-none shadow-indigo-600/20 font-medium'
-                }`}>
-                  <div className="text-[10px] uppercase font-black tracking-[0.2em] mb-3 opacity-40">
-                    {m.role === 'interviewer' ? 'Strategic Inquiry' : 'Candidate Response'}
-                  </div>
-                  {m.text}
-                  <div className={`mt-4 text-[9px] font-black uppercase tracking-widest opacity-30 flex items-center gap-2 ${m.role === 'interviewer' ? 'justify-start' : 'justify-end'}`}>
-                     <i className="far fa-clock"></i> {new Date(m.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
-                  </div>
-                </div>
-              </div>
-            ))}
-
-            {loading && (
-              <div className="flex justify-start animate-in fade-in duration-300">
-                 <div className="glass px-6 py-4 rounded-[1.5rem] rounded-tl-none border-l-4 border-l-indigo-500/50 flex gap-2 items-center">
-                    <div className="flex gap-1">
-                      <span className="w-1.5 h-1.5 bg-indigo-400 rounded-full animate-bounce [animation-delay:-0.3s]"></span>
-                      <span className="w-1.5 h-1.5 bg-indigo-400 rounded-full animate-bounce [animation-delay:-0.15s]"></span>
-                      <span className="w-1.5 h-1.5 bg-indigo-400 rounded-full animate-bounce"></span>
-                    </div>
-                    <span className="text-[10px] font-black text-indigo-400 uppercase tracking-widest ml-2">Evaluating Response...</span>
-                 </div>
-              </div>
-            )}
-          </div>
-
-          <footer className="p-6 md:p-10 bg-[#030712] border-t border-white/5 relative z-30 shrink-0">
-             <div className="max-w-4xl mx-auto flex items-end gap-5">
-                <div className="flex-grow relative group">
-                  <textarea 
-                    rows={1}
-                    className="w-full bg-black/40 border border-white/5 group-focus-within:border-indigo-500/40 rounded-[2rem] pl-8 pr-20 py-5 text-sm text-white outline-none shadow-inner transition-all resize-none scrollbar-none" 
-                    placeholder="Formulate your detailed response..." 
-                    value={input} 
-                    onChange={(e) => {
-                      setInput(e.target.value);
-                      e.target.style.height = 'auto';
-                      e.target.style.height = Math.min(e.target.scrollHeight, 120) + 'px';
-                    }} 
-                    onKeyDown={(e) => {
-                      if (e.key === 'Enter' && !e.shiftKey) {
-                        e.preventDefault();
-                        handleSendText();
-                      }
-                    }} 
-                    disabled={loading} 
-                  />
-                  <div className="absolute right-6 bottom-5 flex items-center gap-4">
-                    <span className="hidden sm:inline text-[9px] font-black text-slate-600 uppercase tracking-widest">Press Enter to Send</span>
-                  </div>
-                </div>
-                <button 
-                  onClick={handleSendText} 
-                  disabled={loading || !input.trim()} 
-                  className="w-16 h-16 bg-indigo-600 hover:bg-indigo-500 rounded-[1.5rem] flex items-center justify-center text-white shadow-2xl shadow-indigo-600/30 active:scale-90 disabled:opacity-50 disabled:grayscale transition-all shrink-0"
-                >
-                  <i className="fas fa-paper-plane-top text-lg"></i>
-                </button>
-             </div>
-          </footer>
-
-          {/* Chat Overlays */}
-          {isConfirming && (
-             <div className="absolute inset-0 bg-black/90 backdrop-blur-2xl z-[100] flex items-center justify-center p-6">
-                <div className="glass rounded-[3.5rem] p-12 max-sm w-full text-center space-y-10 animate-in zoom-in-95 duration-300">
-                   <div className="w-24 h-24 bg-rose-500/10 rounded-[2rem] flex items-center justify-center mx-auto text-rose-500 text-5xl">
-                      <i className="fas fa-flag-checkered"></i>
-                   </div>
-                   <div>
-                      <h3 className="text-white font-black text-3xl tracking-tighter mb-4">Complete Interview?</h3>
-                      <p className="text-slate-500 text-sm font-medium leading-relaxed">Ending the session will generate your professional performance analysis based on the conversation history.</p>
-                   </div>
-                   <div className="flex flex-col gap-4">
-                      <button onClick={proceedToEvaluation} className="w-full py-5 bg-indigo-600 text-white rounded-2xl font-black text-xs uppercase tracking-widest shadow-xl shadow-indigo-600/30 active:scale-95 transition-all">Submit & Evaluate</button>
-                      <button onClick={() => setIsConfirming(false)} className="w-full py-5 text-slate-500 font-bold text-xs uppercase hover:text-white transition-colors">Resume Conversation</button>
-                   </div>
-                </div>
-             </div>
-          )}
-        </div>
-      </div>
-    );
-  }
-
-  // Video Mode - Enhanced with real-time transcript tracking
+  // Premium Video Mode Interface (Google Meet Style)
   return (
     <div className="h-[calc(100vh-80px)] bg-[#030712] text-white flex flex-col relative overflow-hidden">
-      <div className={`flex-grow p-4 lg:p-6 grid gap-4 lg:gap-6 transition-all duration-500 ${showTranscriptPanel ? 'grid-cols-1 md:grid-cols-[1fr_350px]' : 'grid-cols-1 md:grid-cols-2'}`}>
+      
+      {/* Dynamic Status Bar (Meet Style) */}
+      <div className="absolute top-8 left-8 z-50 flex items-center gap-4">
+        <div className="flex items-center gap-2 bg-red-600/20 border border-red-500/30 px-4 py-2 rounded-xl backdrop-blur-3xl">
+          <div className="w-2 h-2 rounded-full bg-red-500 animate-pulse"></div>
+          <span className="text-[10px] font-black uppercase tracking-widest">Live Recording</span>
+        </div>
+        <div className="bg-white/5 border border-white/10 px-4 py-2 rounded-xl backdrop-blur-3xl text-[10px] font-black uppercase tracking-widest text-slate-400">
+           {jobRole} | Professional Audit
+        </div>
+      </div>
+
+      <div className={`flex-grow p-4 lg:p-12 grid gap-6 lg:gap-10 transition-all duration-700 ${showTranscriptPanel ? 'grid-cols-1 md:grid-cols-[1fr_420px]' : 'grid-cols-1'}`}>
         
-        {/* Main Video Viewport */}
-        <div className={`grid gap-4 lg:gap-6 h-full ${showTranscriptPanel ? 'grid-cols-1' : 'grid-cols-1 md:grid-cols-2'}`}>
-          {/* Interviewer Panel */}
-          <div className="relative glass rounded-[2.5rem] overflow-hidden flex flex-col items-center justify-center border-white/5 group">
-             <div className="absolute top-6 left-6 z-10 bg-black/40 px-3 py-1.5 rounded-xl border border-white/10 flex items-center gap-2 backdrop-blur-xl">
-               <i className="fas fa-user-tie text-indigo-400 text-[10px]"></i>
-               <span className="text-[10px] font-black uppercase tracking-widest">Executive Recruiter</span>
-             </div>
-             
-             <div className="relative w-48 h-48 lg:w-64 lg:h-64">
-                <div className={`absolute inset-0 bg-indigo-600/10 rounded-full ${isLive && !loading ? 'animate-pulse' : ''}`}></div>
-                <div className="relative w-full h-full rounded-full bg-indigo-600/10 border-2 border-indigo-500/20 flex items-center justify-center overflow-hidden">
-                   <i className="fas fa-user-tie text-6xl lg:text-8xl text-indigo-500 opacity-60"></i>
-                   <canvas ref={canvasRef} width={250} height={120} className="absolute bottom-10 left-0 w-full opacity-60 pointer-events-none" />
-                </div>
-             </div>
-
-             {/* Live Subtitle Overlay - AI */}
-             <div className="absolute bottom-10 left-1/2 -translate-x-1/2 w-[85%] pointer-events-none z-20">
-                {aiTranscription && showCaptions && (
-                  <div className="bg-indigo-950/90 backdrop-blur-3xl px-8 py-5 rounded-[2rem] text-center text-lg lg:text-xl font-bold italic border border-indigo-500/30 text-white shadow-2xl animate-in slide-in-from-bottom-2 duration-300">
-                    <div className="text-[9px] font-black uppercase tracking-widest mb-2 opacity-50 text-indigo-400">Interviewer</div>
-                    "{aiTranscription}"
+        {/* Cinematic Stage Area */}
+        <div className="relative flex flex-col h-full bg-black/40 rounded-[4rem] border border-white/5 overflow-hidden shadow-[0_40px_100px_rgba(0,0,0,0.4)]">
+          
+          <div className="flex-grow grid grid-cols-1 md:grid-cols-2 gap-6 lg:gap-10 p-6 lg:p-10 items-center">
+            {/* AI Recruiter Feed */}
+            <div className="relative aspect-video glass rounded-[3rem] overflow-hidden flex items-center justify-center group border border-indigo-500/10 hover:border-indigo-500/30 transition-all">
+               <div className="absolute bottom-6 left-6 z-10 bg-black/70 px-4 py-2 rounded-2xl border border-white/10 flex items-center gap-3 backdrop-blur-2xl">
+                 <div className="w-1.5 h-1.5 rounded-full bg-indigo-500"></div>
+                 <span className="text-[10px] font-black uppercase tracking-widest text-white">Recruiter Agent</span>
+               </div>
+               
+               <div className="relative w-44 h-44 lg:w-64 lg:h-64">
+                  <div className={`absolute inset-0 bg-indigo-600/15 rounded-full blur-3xl transition-all ${isLive && !loading ? 'scale-110 opacity-100' : 'scale-90 opacity-0'}`}></div>
+                  <div className="relative w-full h-full rounded-full bg-indigo-600/10 border-2 border-indigo-500/20 flex items-center justify-center overflow-hidden backdrop-blur-md">
+                     <i className="fas fa-user-tie text-6xl lg:text-8xl text-indigo-500/50"></i>
+                     <canvas ref={canvasRef} width={250} height={120} className="absolute bottom-10 left-0 w-full opacity-60 pointer-events-none" />
                   </div>
-                )}
-             </div>
-          </div>
-
-          {/* Candidate Panel */}
-          <div className="relative glass rounded-[2.5rem] overflow-hidden flex flex-col items-center justify-center border-white/5 group">
-            <div className="absolute top-6 left-6 z-10 bg-black/40 px-3 py-1.5 rounded-xl border border-white/10 flex items-center gap-2 backdrop-blur-xl">
-              <i className="fas fa-user text-emerald-400 text-[10px]"></i>
-              <span className="text-[10px] font-black uppercase tracking-widest">Candidate (You)</span>
+               </div>
             </div>
-            
-            <video ref={videoRef} autoPlay muted playsInline className={`w-full h-full object-cover transition-opacity duration-700 ${isVideoOff ? 'opacity-0' : 'opacity-100'}`} />
-            
-            {isVideoOff && (
-              <div className="absolute inset-0 flex items-center justify-center bg-zinc-950">
-                <div className="w-32 h-32 rounded-full bg-zinc-900 flex items-center justify-center shadow-inner">
-                  <i className="fas fa-video-slash text-5xl text-zinc-700"></i>
-                </div>
-              </div>
-            )}
-            
-            <canvas ref={frameCanvasRef} className="hidden" />
-            <canvas ref={userCanvasRef} width={100} height={50} className="absolute top-6 right-6 w-24 h-12 opacity-40 pointer-events-none" />
 
-            {/* Live Subtitle Overlay - Candidate */}
-            <div className="absolute bottom-10 left-1/2 -translate-x-1/2 w-[85%] pointer-events-none z-20">
-              {userTranscription && showCaptions && (
-                <div className="bg-emerald-950/90 backdrop-blur-3xl px-8 py-5 rounded-[2rem] text-center text-lg lg:text-xl font-bold italic border border-emerald-500/30 text-white shadow-2xl animate-in slide-in-from-bottom-2 duration-300">
-                   <div className="text-[9px] font-black uppercase tracking-widest mb-2 opacity-50 text-emerald-400">Transcribing Candidate</div>
-                   "{userTranscription}"
+            {/* Candidate User Feed */}
+            <div className="relative aspect-video glass rounded-[3rem] overflow-hidden flex items-center justify-center group border border-emerald-500/10 hover:border-emerald-500/30 transition-all">
+              <div className="absolute bottom-6 left-6 z-10 bg-black/70 px-4 py-2 rounded-2xl border border-white/10 flex items-center gap-3 backdrop-blur-2xl">
+                <div className="w-1.5 h-1.5 rounded-full bg-emerald-500"></div>
+                <span className="text-[10px] font-black uppercase tracking-widest text-white">You (Candidate)</span>
+              </div>
+              
+              <video ref={videoRef} autoPlay muted playsInline className={`w-full h-full object-cover transition-all duration-700 ${isVideoOff ? 'scale-110 opacity-0 grayscale' : 'scale-100 opacity-100'}`} />
+              
+              {isVideoOff && (
+                <div className="absolute inset-0 flex items-center justify-center bg-zinc-950/80">
+                   <div className="w-32 h-32 rounded-full bg-white/5 border border-white/10 flex items-center justify-center">
+                     <i className="fas fa-video-slash text-4xl text-zinc-700"></i>
+                   </div>
                 </div>
               )}
+              
+              <canvas ref={frameCanvasRef} className="hidden" />
+              <canvas ref={userCanvasRef} width={100} height={50} className="absolute bottom-6 right-6 w-24 h-12 opacity-60 pointer-events-none" />
             </div>
+          </div>
+
+          {/* Centered Captions Overlay (Google Meet Style) */}
+          <div className="absolute bottom-12 left-1/2 -translate-x-1/2 w-full max-w-4xl px-12 pointer-events-none z-20 text-center">
+             {(showCaptions && (aiTranscription || userTranscription)) ? (
+               <div className="bg-black/85 backdrop-blur-3xl px-12 py-8 rounded-[3.5rem] border border-white/10 shadow-[0_20px_60px_rgba(0,0,0,0.5)] animate-in slide-in-from-bottom-6 duration-500">
+                  <div className="text-[9px] font-black uppercase tracking-[0.5em] mb-4 text-indigo-400 opacity-80">
+                    {aiTranscription ? 'Executive Agent Speaking' : 'Candidate Audio Transcribed'}
+                  </div>
+                  <p className="text-2xl md:text-3xl font-black text-white tracking-tight leading-snug">
+                    {aiTranscription || userTranscription}
+                  </p>
+               </div>
+             ) : null}
           </div>
         </div>
 
-        {/* Dynamic Transcript Sidebar */}
+        {/* Integrated Transcript Sidebar */}
         {showTranscriptPanel && (
-          <aside className="glass rounded-[2.5rem] border-white/5 flex flex-col h-full overflow-hidden animate-in slide-in-from-right-10 duration-500">
-            <header className="p-6 border-b border-white/5 flex items-center justify-between bg-white/[0.02]">
-               <h3 className="text-[10px] font-black uppercase tracking-[0.3em] text-slate-500">Live Audit Session</h3>
-               <button onClick={() => setShowTranscriptPanel(false)} className="text-slate-500 hover:text-white transition-colors"><i className="fas fa-times"></i></button>
+          <aside className="glass rounded-[4rem] border-white/5 flex flex-col h-full overflow-hidden animate-in slide-in-from-right-10 duration-700 shadow-[0_30px_80px_rgba(0,0,0,0.3)]">
+            <header className="p-10 border-b border-white/5 flex items-center justify-between bg-white/[0.03]">
+               <div>
+                 <h3 className="text-[12px] font-black uppercase tracking-[0.4em] text-white">Full Transcript</h3>
+                 <p className="text-[9px] font-bold text-slate-500 uppercase tracking-widest mt-1">Real-time Session Feed</p>
+               </div>
+               <button onClick={() => setShowTranscriptPanel(false)} className="w-10 h-10 rounded-full hover:bg-white/10 flex items-center justify-center transition-colors"><i className="fas fa-times text-xs"></i></button>
             </header>
-            <div ref={panelScrollRef} className="flex-grow overflow-y-auto p-6 space-y-8 scrollbar-thin scrollbar-thumb-white/10">
-               {messages.length === 0 && !userTranscription && !aiTranscription && (
-                 <div className="text-center py-20 opacity-20">
-                    <i className="fas fa-quote-right text-4xl mb-4 block"></i>
-                    <p className="text-[9px] font-black uppercase tracking-widest">Awaiting interaction...</p>
-                 </div>
-               )}
+            <div ref={panelScrollRef} className="flex-grow overflow-y-auto p-10 space-y-12 scrollbar-thin">
                {messages.map((m, idx) => (
-                 <div key={idx} className={`space-y-2 ${m.role === 'interviewer' ? 'text-left' : 'text-right'}`}>
-                    <div className={`text-[8px] font-black uppercase tracking-widest ${m.role === 'interviewer' ? 'text-indigo-400' : 'text-emerald-400'}`}>{m.role}</div>
-                    <div className={`p-4 rounded-2xl text-[13px] leading-relaxed inline-block ${m.role === 'interviewer' ? 'bg-indigo-600/10 border border-indigo-500/10 text-slate-300' : 'bg-emerald-600/10 border border-emerald-500/10 text-slate-300'}`}>
+                 <div key={idx} className={`space-y-4 ${m.role === 'interviewer' ? 'text-left' : 'text-right'}`}>
+                    <div className={`text-[9px] font-black uppercase tracking-widest flex items-center gap-2 ${m.role === 'interviewer' ? 'justify-start text-indigo-400' : 'justify-end text-emerald-400'}`}>
+                      {m.role === 'interviewer' ? <i className="fas fa-robot"></i> : <i className="fas fa-user"></i>}
+                      {m.role}
+                    </div>
+                    <div className={`p-6 rounded-[2rem] text-[15px] leading-relaxed inline-block font-medium ${m.role === 'interviewer' ? 'bg-indigo-600/10 border border-indigo-500/10 text-slate-200' : 'bg-emerald-600/10 border border-emerald-500/10 text-slate-200'}`}>
                        {m.text}
                     </div>
                  </div>
                ))}
                {(userTranscription || aiTranscription) && (
-                 <div className="space-y-6 pt-4 border-t border-white/5">
+                 <div className="space-y-10 pt-10 border-t border-white/5">
                    {aiTranscription && (
-                     <div className="space-y-2 text-left animate-pulse">
-                        <div className="text-[8px] font-black uppercase tracking-widest text-indigo-400">Interviewer (Streaming)</div>
-                        <div className="p-4 rounded-2xl bg-indigo-600/5 text-[13px] text-indigo-200/60 leading-relaxed italic border border-indigo-500/5">{aiTranscription}</div>
+                     <div className="space-y-4 text-left animate-pulse">
+                        <div className="text-[9px] font-black uppercase tracking-widest text-indigo-400">Agent Processing...</div>
+                        <div className="text-base text-slate-400 italic leading-relaxed">{aiTranscription}</div>
                      </div>
                    )}
                    {userTranscription && (
-                     <div className="space-y-2 text-right animate-pulse">
-                        <div className="text-[8px] font-black uppercase tracking-widest text-emerald-400">Candidate (Streaming)</div>
-                        <div className="p-4 rounded-2xl bg-emerald-600/5 text-[13px] text-emerald-200/60 leading-relaxed italic border border-emerald-500/5">{userTranscription}</div>
+                     <div className="space-y-4 text-right animate-pulse">
+                        <div className="text-[9px] font-black uppercase tracking-widest text-emerald-400">Candidate Streaming...</div>
+                        <div className="text-base text-slate-400 italic leading-relaxed">{userTranscription}</div>
                      </div>
                    )}
                  </div>
@@ -587,45 +432,58 @@ const InterviewTool: React.FC<Props> = ({ initialJobRole, initialTechStack, onEv
         )}
       </div>
 
-      {/* Control Console */}
-      <div className="h-28 bg-[#030712]/80 backdrop-blur-2xl flex items-center justify-center px-10 relative z-30 border-t border-white/5">
-        <div className="flex items-center gap-5">
-          <button onClick={toggleMute} className={`w-16 h-16 rounded-3xl flex items-center justify-center transition-all shadow-xl ${isMuted ? 'bg-red-500/20 text-red-500 border border-red-500/30' : 'bg-white/5 hover:bg-white/10 text-white'}`} title="Toggle Microphone">
+      {/* Floating Controls Bar (Google Meet Style) */}
+      <div className="h-32 bg-[#030712]/95 backdrop-blur-3xl flex items-center justify-center px-10 relative z-30 border-t border-white/10 shadow-[0_-20px_50px_rgba(0,0,0,0.3)]">
+        <div className="flex items-center gap-5 lg:gap-8">
+          <button onClick={toggleMute} className={`w-16 h-16 rounded-full flex items-center justify-center transition-all ${isMuted ? 'bg-red-600 text-white shadow-xl shadow-red-600/20' : 'bg-zinc-800 hover:bg-zinc-700 text-white border border-white/5'}`}>
             <i className={`fas ${isMuted ? 'fa-microphone-slash' : 'fa-microphone'} text-xl`}></i>
           </button>
-          <button onClick={toggleVideo} className={`w-16 h-16 rounded-3xl flex items-center justify-center transition-all shadow-xl ${isVideoOff ? 'bg-red-500/20 text-red-500 border border-red-500/30' : 'bg-white/5 hover:bg-white/10 text-white'}`} title="Toggle Video">
+          <button onClick={toggleVideo} className={`w-16 h-16 rounded-full flex items-center justify-center transition-all ${isVideoOff ? 'bg-red-600 text-white shadow-xl shadow-red-600/20' : 'bg-zinc-800 hover:bg-zinc-700 text-white border border-white/5'}`}>
             <i className={`fas ${isVideoOff ? 'fa-video-slash' : 'fa-video'} text-xl`}></i>
           </button>
-          <div className="w-px h-10 bg-white/10 mx-2"></div>
-          <button onClick={() => setShowCaptions(!showCaptions)} className={`w-16 h-16 rounded-3xl flex items-center justify-center transition-all shadow-xl ${showCaptions ? 'bg-indigo-600 text-white shadow-indigo-600/30' : 'bg-white/5 hover:bg-white/10 text-white'}`} title="Toggle Live Captions">
+          
+          <div className="w-px h-10 bg-white/10 mx-4"></div>
+          
+          <button onClick={() => setShowCaptions(!showCaptions)} className={`w-16 h-16 rounded-full flex items-center justify-center transition-all ${showCaptions ? 'bg-indigo-600 text-white shadow-xl shadow-indigo-600/20' : 'bg-zinc-800 hover:bg-zinc-700 text-white'}`}>
             <i className="fas fa-closed-captioning text-xl"></i>
           </button>
-          <button onClick={() => setShowTranscriptPanel(!showTranscriptPanel)} className={`w-16 h-16 rounded-3xl flex items-center justify-center transition-all shadow-xl ${showTranscriptPanel ? 'bg-indigo-600 text-white shadow-indigo-600/30' : 'bg-white/5 hover:bg-white/10 text-white'}`} title="Toggle Transcript Sidebar">
+          <button onClick={() => setShowTranscriptPanel(!showTranscriptPanel)} className={`w-16 h-16 rounded-full flex items-center justify-center transition-all ${showTranscriptPanel ? 'bg-indigo-600 text-white shadow-xl shadow-indigo-600/20' : 'bg-zinc-800 hover:bg-zinc-700 text-white'}`}>
             <i className="fas fa-list-ul text-xl"></i>
           </button>
-          <button onClick={() => setIsConfirming(true)} className="px-10 h-16 bg-red-600 hover:bg-red-500 text-white rounded-3xl font-black text-xs uppercase tracking-widest flex items-center gap-3 transition-all active:scale-95 shadow-xl shadow-red-600/20 ml-6">
-            <i className="fas fa-phone-slash rotate-[135deg]"></i> Exit Session
+          
+          <button onClick={() => setIsConfirming(true)} className="px-12 h-16 bg-red-600 hover:bg-red-500 text-white rounded-full font-black text-[11px] uppercase tracking-widest flex items-center gap-5 transition-all active:scale-95 shadow-2xl shadow-red-600/30 ml-8 group">
+            <i className="fas fa-phone-slash rotate-[135deg] text-lg group-hover:scale-110 transition-transform"></i> End Session
           </button>
         </div>
       </div>
 
+      {/* Confirmation Overlay */}
       {isConfirming && (
-        <div className="fixed inset-0 bg-[#030712]/90 backdrop-blur-2xl z-[150] flex items-center justify-center p-6">
-          <div className="glass rounded-[3rem] p-12 max-sm w-full text-center space-y-10 border-indigo-500/20 animate-in zoom-in-95">
-             <div className="w-24 h-24 bg-indigo-600/10 rounded-[2rem] flex items-center justify-center mx-auto text-indigo-400 text-5xl"><i className="fas fa-check-circle"></i></div>
-             <div><h3 className="text-3xl font-black mb-3 tracking-tighter">Complete Session?</h3><p className="text-slate-500 text-sm font-medium">Ending the session will generate your performance evaluation.</p></div>
-             <div className="flex flex-col gap-3">
-                <button onClick={proceedToEvaluation} className="w-full py-5 bg-indigo-600 text-white rounded-2xl font-black text-xs uppercase tracking-widest shadow-xl shadow-indigo-600/30">Finish</button>
-                <button onClick={() => setIsConfirming(false)} className="w-full py-5 text-slate-500 font-black text-xs uppercase hover:text-white transition-colors">Resume Practice</button>
+        <div className="fixed inset-0 bg-black/98 backdrop-blur-3xl z-[150] flex items-center justify-center p-6">
+          <div className="glass rounded-[4rem] p-16 max-w-lg w-full text-center space-y-12 border border-white/10 animate-in zoom-in-95 duration-500 shadow-2xl">
+             <div className="w-28 h-28 bg-indigo-600/15 rounded-[2.5rem] flex items-center justify-center mx-auto text-indigo-400 text-6xl shadow-2xl border border-indigo-500/20"><i className="fas fa-check-double"></i></div>
+             <div className="space-y-4">
+                <h3 className="text-4xl font-black text-white tracking-tighter">Analysis Complete?</h3>
+                <p className="text-slate-500 text-base font-medium leading-relaxed">Ending this call will freeze the transcript and begin your professional performance scoring.</p>
+             </div>
+             <div className="flex flex-col gap-5">
+                <button onClick={proceedToEvaluation} className="w-full py-6 bg-indigo-600 hover:bg-indigo-500 text-white rounded-3xl font-black text-xs uppercase tracking-widest shadow-2xl shadow-indigo-600/40 transition-all">Submit for Professional Audit</button>
+                <button onClick={() => setIsConfirming(false)} className="w-full py-6 text-slate-600 font-black text-xs uppercase hover:text-white transition-all">Resume Discussion</button>
              </div>
           </div>
         </div>
       )}
 
       {evaluating && (
-        <div className="fixed inset-0 bg-[#030712] z-[200] flex flex-col items-center justify-center gap-8 animate-in fade-in duration-700">
-           <div className="w-24 h-24 border-4 border-indigo-500/10 border-t-indigo-500 rounded-full animate-spin"></div>
-           <div className="text-center"><h3 className="text-2xl font-black mb-2 uppercase tracking-tight">Generating Evaluation...</h3><p className="text-slate-500 text-sm font-bold uppercase tracking-[0.4em]">Reviewing Performance Metrics</p></div>
+        <div className="fixed inset-0 bg-[#030712] z-[200] flex flex-col items-center justify-center gap-12 animate-in fade-in duration-1000">
+           <div className="relative">
+              <div className="w-40 h-40 border-4 border-indigo-500/10 border-t-indigo-500 rounded-full animate-spin"></div>
+              <div className="absolute inset-0 flex items-center justify-center text-indigo-500"><i className="fas fa-brain text-4xl animate-pulse"></i></div>
+           </div>
+           <div className="text-center space-y-6">
+              <h3 className="text-4xl font-black text-white tracking-tighter">Generating Executive Evaluation</h3>
+              <p className="text-slate-600 text-[11px] font-black uppercase tracking-[0.6em] animate-pulse">Processing Performance Metrics</p>
+           </div>
         </div>
       )}
     </div>

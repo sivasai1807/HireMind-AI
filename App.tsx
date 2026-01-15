@@ -9,6 +9,7 @@ import { AppView, AtsAnalysis, InterviewEvaluation, Message, SavedInterview, Sav
 
 const App: React.FC = () => {
   const [view, setView] = useState<AppView>('landing');
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [jobRole, setJobRole] = useState<string>('');
   const [techStack, setTechStack] = useState<string>('');
   const [resumeText, setResumeText] = useState<string>('');
@@ -58,6 +59,7 @@ const App: React.FC = () => {
 
   const navigate = useCallback((newView: AppView) => {
     setView(newView);
+    setMobileMenuOpen(false);
     window.scrollTo({ top: 0, behavior: 'smooth' });
   }, []);
 
@@ -96,10 +98,45 @@ const App: React.FC = () => {
     navigate('learning-path');
   };
 
+  const navOptions = [
+    { id: 'resume', label: 'Resume Audit' },
+    { id: 'interview', label: 'Interview Lab' },
+    { id: 'learning-path', label: 'Career Strategy' }
+  ];
+
   return (
     <div className="min-h-screen flex flex-col selection:bg-indigo-500/30">
-      <header className="sticky top-0 z-[100] border-b border-white/5 bg-[#030712]/80 backdrop-blur-2xl">
+      {/* Dynamic Mobile Menu Overlay */}
+      <div className={`fixed inset-0 z-[200] lg:hidden transition-all duration-500 ${mobileMenuOpen ? 'opacity-100 visible' : 'opacity-0 invisible pointer-events-none'}`}>
+        <div className="absolute inset-0 bg-black/95 backdrop-blur-3xl" onClick={() => setMobileMenuOpen(false)}></div>
+        <div className={`absolute top-0 left-0 w-full glass-b border-b border-white/5 p-10 space-y-8 transition-transform duration-500 ${mobileMenuOpen ? 'translate-y-0' : '-translate-y-full'}`}>
+          <div className="flex justify-between items-center mb-10">
+            <span className="text-xl font-black text-white tracking-tighter">Command Menu</span>
+            <button onClick={() => setMobileMenuOpen(false)} className="w-12 h-12 rounded-full bg-white/5 flex items-center justify-center text-white"><i className="fas fa-times"></i></button>
+          </div>
+          <div className="flex flex-col gap-4">
+            {navOptions.map(opt => (
+              <button 
+                key={opt.id} 
+                onClick={() => navigate(opt.id as AppView)}
+                className={`w-full py-6 rounded-3xl text-left px-8 font-black uppercase tracking-widest text-xs transition-all ${view === opt.id ? 'bg-indigo-600 text-white shadow-xl' : 'bg-white/5 text-slate-400'}`}
+              >
+                {opt.label}
+              </button>
+            ))}
+            <button 
+              onClick={() => navigate('dashboard')}
+              className={`w-full py-6 rounded-3xl text-left px-8 font-black uppercase tracking-widest text-xs transition-all ${view === 'dashboard' ? 'bg-emerald-600 text-white shadow-xl' : 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20'}`}
+            >
+              Success Board
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <header className="sticky top-0 z-[100] border-b border-white/5 bg-[#030712]/95 backdrop-blur-2xl">
         <div className="max-w-7xl mx-auto px-6 h-20 flex items-center justify-between">
+          {/* Brand */}
           <button onClick={() => navigate('landing')} className="flex items-center gap-3 text-2xl font-black tracking-tighter text-white group">
             <div className="w-10 h-10 rounded-xl bg-indigo-600 flex items-center justify-center shadow-lg shadow-indigo-600/20 group-hover:scale-110 transition-transform">
               <i className="fas fa-briefcase"></i>
@@ -107,34 +144,34 @@ const App: React.FC = () => {
             <span>HireMind</span>
           </button>
           
+          {/* Desktop Nav */}
           <nav className="hidden lg:flex items-center gap-2">
-            {[
-              { id: 'resume', label: 'Resume Audit' },
-              { id: 'interview', label: 'Interview Lab' },
-              { id: 'learning-path', label: 'Career Strategy' },
-              { id: 'dashboard', label: 'Success Board' }
-            ].map((v) => (
+            {navOptions.map((v) => (
               <button 
                 key={v.id}
                 onClick={() => navigate(v.id as AppView)} 
-                className={`px-5 py-2 rounded-xl text-[10px] font-black uppercase tracking-[0.2em] transition-all relative group ${view === v.id ? 'bg-indigo-600/10 text-indigo-400' : 'text-slate-500 hover:text-white hover:bg-white/5'}`}
+                className={`px-5 py-2.5 rounded-xl text-[10px] font-black uppercase tracking-[0.2em] transition-all relative group ${view === v.id ? 'bg-indigo-600/10 text-indigo-400' : 'text-slate-500 hover:text-white hover:bg-white/5'}`}
               >
                 {v.label}
               </button>
             ))}
           </nav>
 
-          <div className="flex items-center gap-4">
-            <div className="hidden sm:flex items-center gap-2 px-4 py-2 rounded-lg bg-emerald-500/10 border border-emerald-500/20">
-              <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
-              <span className="text-[9px] font-black text-emerald-400 uppercase tracking-widest">AI Agent Online</span>
-            </div>
+          {/* User History & Mobile Toggle */}
+          <div className="flex items-center gap-3">
+            <button 
+              onClick={() => navigate('dashboard')} 
+              className={`flex items-center gap-3 px-6 py-2.5 rounded-xl transition-all border ${view === 'dashboard' ? 'bg-indigo-600/20 text-indigo-400 border-indigo-500/30 shadow-lg shadow-indigo-500/10' : 'bg-white/5 hover:bg-white/10 text-slate-400 border-transparent'}`}
+            >
+              <i className="fas fa-chart-line text-sm"></i>
+              <span className="text-[10px] font-black uppercase tracking-widest hidden md:inline">Success Board</span>
+            </button>
             
             <button 
-              onClick={() => navigate('landing')} 
-              className="lg:hidden w-10 h-10 rounded-xl bg-white/5 flex items-center justify-center text-slate-400 hover:bg-white/10"
+              onClick={() => setMobileMenuOpen(true)} 
+              className="lg:hidden w-11 h-11 rounded-xl bg-white/5 flex items-center justify-center text-slate-400 hover:bg-white/10 transition-colors"
             >
-              <i className="fas fa-bars"></i>
+              <i className="fas fa-bars-staggered"></i>
             </button>
           </div>
         </div>
@@ -181,7 +218,7 @@ const App: React.FC = () => {
             </div>
           </div>
           <div className="text-2xl font-black mb-4 tracking-tighter">HireMind AI</div>
-          <p className="text-slate-500 text-sm max-w-md mx-auto mb-10 font-medium">Precision-engineered tools for high-performance career trajectory management and FAANG-level readiness.</p>
+          <p className="text-slate-500 text-sm max-w-md mx-auto mb-10 font-medium leading-relaxed">Advanced career orchestration infrastructure for high-performance professional trajectory management.</p>
           <div className="flex justify-center gap-8 mb-12">
             {['linkedin', 'twitter', 'github'].map(social => (
               <i key={social} className={`fab fa-${social} text-slate-500 hover:text-white text-xl cursor-pointer transition-colors`}></i>
