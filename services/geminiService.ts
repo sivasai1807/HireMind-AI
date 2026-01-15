@@ -1,11 +1,11 @@
 
 import { GoogleGenAI, Type, GenerateContentResponse } from "@google/genai";
-import { AtsAnalysis, InterviewEvaluation, LearningRoadmap } from "../types";
+import { AtsAnalysis, InterviewEvaluation, LearningRoadmap, InterviewRound } from "../types";
 
-const SYSTEM_PERSONALITY = `You are a Senior Executive Career Coach and Talent Acquisition Specialist with over 20 years of experience at top-tier global firms. 
-Your tone is professional, insightful, and direct. You provide high-level constructive feedback that helps candidates excel in competitive hiring environments.
-Your expertise includes resume optimization, behavioral and technical interviewing, and career progression strategy.
-Always communicate as a human expert. Avoid robotic language or technical jargon like 'neural' or 'syncing'. Base your feedback on current hiring benchmarks for Fortune 500 and leading startups.`;
+const SYSTEM_PERSONALITY = `You are a Principal Engineer and Elite Technical Recruiter at a Tier-1 tech firm. 
+Your tone is high-stakes, professional, and discerning. You focus on deep technical architectural understanding, algorithmic efficiency, and professional leadership.
+You do not use emojis or robotic fillers. You ask sharp, multi-layered questions that probe the boundaries of a candidate's knowledge.
+In Coding rounds, you provide clear, challenging problems and guide the candidate through edge cases and complexity analysis (Big O).`;
 
 export class GeminiService {
   private async safeCall<T>(fn: () => Promise<T>, maxRetries = 3): Promise<T> {
@@ -40,10 +40,16 @@ export class GeminiService {
     });
   }
 
-  async startInterview(role: string, stack: string, difficulty: string): Promise<string> {
+  async startInterview(role: string, stack: string, difficulty: string, round: InterviewRound = 'TECHNICAL'): Promise<string> {
     return this.safeCall(async () => {
       const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
-      const prompt = `Start a professional mock interview for a ${role} position. Focus on ${stack} and related technical/behavioral competencies. The seniority level is ${difficulty}. Open the conversation naturally by asking the candidate to introduce themselves and highlight their relevant experience.`;
+      const roundPrompt = round === 'CODING' 
+        ? "Present a complex algorithmic or system design coding challenge." 
+        : round === 'BEHAVIORAL' 
+        ? "Focus on leadership, conflict resolution, and the STAR method." 
+        : "Focus on deep technical internals and architecture.";
+      
+      const prompt = `Round: ${round}. Level: ${difficulty}. Start a professional interview for ${role} with focus on ${stack}. ${roundPrompt} Begin with a high-level introductory challenge or question.`;
       const response = await ai.models.generateContent({
         model: 'gemini-3-pro-preview',
         contents: prompt,
@@ -53,12 +59,13 @@ export class GeminiService {
     });
   }
 
-  async getFollowUpQuestion(history: string, lastAnswer: string): Promise<string> {
+  async getFollowUpQuestion(history: string, lastAnswer: string, round: InterviewRound = 'TECHNICAL'): Promise<string> {
     return this.safeCall(async () => {
       const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
+      const prompt = `Round: ${round}. Interview History: ${history}\nCandidate's last response: ${lastAnswer}\nAsk a challenging, high-level follow-up question. If this is a CODING round, ask about space/time complexity or potential optimizations for the proposed solution. No emojis.`;
       const response = await ai.models.generateContent({
         model: 'gemini-3-pro-preview',
-        contents: `Interview History: ${history}\nCandidate's last response: ${lastAnswer}\nAsk a targeted follow-up question that explores their technical depth or problem-solving methodology.`,
+        contents: prompt,
         config: { systemInstruction: SYSTEM_PERSONALITY }
       });
       return response.text || '';
@@ -70,7 +77,7 @@ export class GeminiService {
       const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
       const response = await ai.models.generateContent({
         model: 'gemini-3-flash-preview',
-        contents: `Evaluate the following interview transcript:\n${transcript}\nProvide professional performance metrics in JSON: technical_score, communication_score, problem_solving_score, confidence_score, overall_feedback, strengths[], weaknesses[], improvement_tips[].`,
+        contents: `Evaluate this interview transcript:\n${transcript}\nProvide professional performance metrics in JSON: technical_score, communication_score, problem_solving_score, confidence_score, overall_feedback, strengths[], weaknesses[], improvement_tips[]. Score strictly.`,
         config: { systemInstruction: SYSTEM_PERSONALITY, responseMimeType: 'application/json' }
       });
       return JSON.parse(response.text || '{}') as InterviewEvaluation;
@@ -80,14 +87,7 @@ export class GeminiService {
   async generateCustomRoadmap(field: string, goal: string): Promise<Partial<LearningRoadmap>> {
     return this.safeCall(async () => {
       const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
-      const prompt = `Create a highly detailed, professional career roadmap for the field: ${field}. User's Goal: ${goal}.
-      You MUST return valid JSON with these keys:
-      estimated_days: number,
-      milestones: Array of objects { week: number, topic: string, description: string, tasks: string[], resources: Array of objects {title, url} },
-      project_suggestions: Array of objects { name, description, tech_stack: string[] },
-      hiring_companies: Array of objects { name, industry, typical_roles: string[] }.
-      Ensure the plan is logical, comprehensive, and helpful for professional growth. Use credible-sounding resource URLs if possible.`;
-      
+      const prompt = `Create a professional career roadmap for: ${field}. Goal: ${goal}.\nReturn JSON: estimated_days, milestones[], project_suggestions[], hiring_companies[].`;
       const response = await ai.models.generateContent({
         model: 'gemini-3-flash-preview',
         contents: prompt,

@@ -31,6 +31,8 @@ export interface Message {
   timestamp: number;
 }
 
+export type InterviewRound = 'BEHAVIORAL' | 'TECHNICAL' | 'CODING';
+
 export interface SavedInterview {
   id: string;
   timestamp: number;
@@ -38,6 +40,7 @@ export interface SavedInterview {
   techStack: string;
   transcript: Message[];
   evaluation: InterviewEvaluation;
+  roundType?: InterviewRound;
 }
 
 export interface LearningRoadmap {
@@ -65,4 +68,13 @@ export interface LearningRoadmap {
   }>;
 }
 
-export type AppView = 'landing' | 'resume' | 'interview' | 'dashboard' | 'learning-path';
+export interface CompanyQuestion {
+  id: string;
+  company: string;
+  role: string;
+  question: string;
+  category: 'Coding' | 'System Design' | 'Behavioral';
+  difficulty: 'Easy' | 'Medium' | 'Hard';
+}
+
+export type AppView = 'landing' | 'resume' | 'interview' | 'dashboard' | 'learning-path' | 'questions-bank';
