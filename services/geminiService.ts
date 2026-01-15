@@ -2,9 +2,10 @@
 import { GoogleGenAI, Type, GenerateContentResponse } from "@google/genai";
 import { AtsAnalysis, InterviewEvaluation, LearningRoadmap, InterviewRound } from "../types";
 
-const SYSTEM_PERSONALITY = `You are a Principal Engineer and Elite Technical Recruiter at a Tier-1 tech firm. 
-Your tone is high-stakes, professional, and discerning. You focus on deep technical architectural understanding, algorithmic efficiency, and professional leadership.
-You do not use emojis or robotic fillers. You ask sharp, multi-layered questions that probe the boundaries of a candidate's knowledge.
+const SYSTEM_PERSONALITY = `You are a Principal Engineer and Elite Technical Recruiter at a Tier-1 tech firm like Google or Stripe. 
+Your tone is high-stakes, professional, and discerning. You focus on deep architectural understanding, algorithmic efficiency, and professional leadership.
+STRICT RULE: DO NOT USE EMOJIS.
+You ask sharp, multi-layered questions that probe the boundaries of a candidate's knowledge.
 In Coding rounds, you provide clear, challenging problems and guide the candidate through edge cases and complexity analysis (Big O).`;
 
 export class GeminiService {
@@ -44,12 +45,12 @@ export class GeminiService {
     return this.safeCall(async () => {
       const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
       const roundPrompt = round === 'CODING' 
-        ? "Present a complex algorithmic or system design coding challenge." 
+        ? "Present a complex algorithmic or system design coding challenge. Focus on efficiency and edge cases." 
         : round === 'BEHAVIORAL' 
-        ? "Focus on leadership, conflict resolution, and the STAR method." 
-        : "Focus on deep technical internals and architecture.";
+        ? "Focus on leadership, high-stakes conflict resolution, and strategic decision making." 
+        : "Focus on deep systems internals, concurrency, and architecture.";
       
-      const prompt = `Round: ${round}. Level: ${difficulty}. Start a professional interview for ${role} with focus on ${stack}. ${roundPrompt} Begin with a high-level introductory challenge or question.`;
+      const prompt = `Round: ${round}. Level: ${difficulty}. Start a professional interview for ${role} with focus on ${stack}. ${roundPrompt} Begin with a high-level introductory question. NO EMOJIS.`;
       const response = await ai.models.generateContent({
         model: 'gemini-3-pro-preview',
         contents: prompt,
@@ -62,7 +63,7 @@ export class GeminiService {
   async getFollowUpQuestion(history: string, lastAnswer: string, round: InterviewRound = 'TECHNICAL'): Promise<string> {
     return this.safeCall(async () => {
       const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
-      const prompt = `Round: ${round}. Interview History: ${history}\nCandidate's last response: ${lastAnswer}\nAsk a challenging, high-level follow-up question. If this is a CODING round, ask about space/time complexity or potential optimizations for the proposed solution. No emojis.`;
+      const prompt = `Round: ${round}. Interview History: ${history}\nCandidate's last response: ${lastAnswer}\nAsk a challenging, high-level follow-up question. Probe deep into their logic. NO EMOJIS.`;
       const response = await ai.models.generateContent({
         model: 'gemini-3-pro-preview',
         contents: prompt,
