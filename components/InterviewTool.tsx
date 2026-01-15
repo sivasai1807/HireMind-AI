@@ -65,10 +65,12 @@ const InterviewTool: React.FC<Props> = ({ initialJobRole, initialTechStack, onEv
   const [userTranscription, setUserTranscription] = useState('');
   const [aiTranscription, setAiTranscription] = useState('');
   const [showCaptions, setShowCaptions] = useState(true);
+  const [showTranscriptPanel, setShowTranscriptPanel] = useState(false);
   const [isMuted, setIsMuted] = useState(false);
   const [isVideoOff, setIsVideoOff] = useState(false);
 
   const scrollRef = useRef<HTMLDivElement>(null);
+  const panelScrollRef = useRef<HTMLDivElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const userCanvasRef = useRef<HTMLCanvasElement>(null);
   const videoRef = useRef<HTMLVideoElement>(null);
@@ -88,6 +90,12 @@ const InterviewTool: React.FC<Props> = ({ initialJobRole, initialTechStack, onEv
       scrollRef.current.scrollTo({ top: scrollRef.current.scrollHeight, behavior: 'smooth' });
     }
   }, [messages, loading]);
+
+  useEffect(() => {
+    if (panelScrollRef.current) {
+      panelScrollRef.current.scrollTo({ top: panelScrollRef.current.scrollHeight, behavior: 'smooth' });
+    }
+  }, [messages, userTranscription, aiTranscription]);
 
   useEffect(() => { return () => stopLiveSession(); }, []);
 
@@ -119,7 +127,7 @@ const InterviewTool: React.FC<Props> = ({ initialJobRole, initialTechStack, onEv
           speechConfig: { voiceConfig: { prebuiltVoiceConfig: { voiceName: 'Puck' } } }, 
           inputAudioTranscription: {}, 
           outputAudioTranscription: {}, 
-          systemInstruction: `Professional Interviewer for a ${jobRole} position. Core focus: ${techStack}. Seniority: ${difficulty}. Conduct a realistic mock interview.` 
+          systemInstruction: `Professional Interviewer for a ${jobRole} position. Core focus: ${techStack}. Seniority: ${difficulty}. Conduct a realistic mock interview. Speak naturally and professionaly.` 
         },
         callbacks: {
           onopen: () => { setIsLive(true); setLoading(false); setStarted(true); 
@@ -149,10 +157,12 @@ const InterviewTool: React.FC<Props> = ({ initialJobRole, initialTechStack, onEv
             if (message.serverContent?.turnComplete) {
               const userText = inputTranscriptionRef.current;
               const aiText = outputTranscriptionRef.current;
-              setMessages(prev => [...prev, 
-                { role: 'candidate', text: userText, timestamp: Date.now() - 1000 }, 
-                { role: 'interviewer', text: aiText, timestamp: Date.now() }
-              ]);
+              if (userText || aiText) {
+                setMessages(prev => [...prev, 
+                  { role: 'candidate', text: userText || '...', timestamp: Date.now() - 1000 }, 
+                  { role: 'interviewer', text: aiText || '...', timestamp: Date.now() }
+                ]);
+              }
               inputTranscriptionRef.current = '';
               outputTranscriptionRef.current = '';
               setUserTranscription('');
@@ -449,7 +459,7 @@ const InterviewTool: React.FC<Props> = ({ initialJobRole, initialTechStack, onEv
           {/* Chat Overlays */}
           {isConfirming && (
              <div className="absolute inset-0 bg-black/90 backdrop-blur-2xl z-[100] flex items-center justify-center p-6">
-                <div className="glass rounded-[3.5rem] p-12 max-w-sm w-full text-center space-y-10 animate-in zoom-in-95 duration-300">
+                <div className="glass rounded-[3.5rem] p-12 max-sm w-full text-center space-y-10 animate-in zoom-in-95 duration-300">
                    <div className="w-24 h-24 bg-rose-500/10 rounded-[2rem] flex items-center justify-center mx-auto text-rose-500 text-5xl">
                       <i className="fas fa-flag-checkered"></i>
                    </div>
@@ -469,44 +479,139 @@ const InterviewTool: React.FC<Props> = ({ initialJobRole, initialTechStack, onEv
     );
   }
 
-  // Video Mode (Remains consistent with the refined aesthetic)
+  // Video Mode - Enhanced with real-time transcript tracking
   return (
     <div className="h-[calc(100vh-80px)] bg-[#030712] text-white flex flex-col relative overflow-hidden">
-      <div className="flex-grow p-6 lg:p-8 grid gap-6 grid-cols-1 md:grid-cols-2">
-        <div className="relative glass rounded-[2.5rem] overflow-hidden flex flex-col items-center justify-center border-white/5">
-           <div className="absolute top-6 left-6 z-10 bg-black/40 px-3 py-1.5 rounded-xl border border-white/10 flex items-center gap-2"><i className="fas fa-user-tie text-indigo-400 text-[10px]"></i><span className="text-[10px] font-black uppercase tracking-widest">Interviewer</span></div>
-           <div className="relative w-48 h-48">
-              <div className={`absolute inset-0 bg-indigo-600/10 rounded-full ${isLive && !loading ? 'animate-ping' : ''}`}></div>
-              <div className="relative w-full h-full rounded-full bg-indigo-600/10 border-2 border-indigo-500/20 flex items-center justify-center overflow-hidden"><i className="fas fa-user-tie text-6xl text-indigo-500 opacity-60"></i><canvas ref={canvasRef} width={200} height={100} className="absolute bottom-6 left-0 w-full opacity-60" /></div>
-           </div>
-           <div className="absolute bottom-10 left-1/2 -translate-x-1/2 w-[90%] pointer-events-none z-20">
-              {aiTranscription && showCaptions && <div className="bg-black/80 backdrop-blur-2xl px-8 py-5 rounded-[2rem] text-center text-xl font-bold italic border border-white/10 leading-relaxed">{aiTranscription}</div>}
-           </div>
-        </div>
+      <div className={`flex-grow p-4 lg:p-6 grid gap-4 lg:gap-6 transition-all duration-500 ${showTranscriptPanel ? 'grid-cols-1 md:grid-cols-[1fr_350px]' : 'grid-cols-1 md:grid-cols-2'}`}>
+        
+        {/* Main Video Viewport */}
+        <div className={`grid gap-4 lg:gap-6 h-full ${showTranscriptPanel ? 'grid-cols-1' : 'grid-cols-1 md:grid-cols-2'}`}>
+          {/* Interviewer Panel */}
+          <div className="relative glass rounded-[2.5rem] overflow-hidden flex flex-col items-center justify-center border-white/5 group">
+             <div className="absolute top-6 left-6 z-10 bg-black/40 px-3 py-1.5 rounded-xl border border-white/10 flex items-center gap-2 backdrop-blur-xl">
+               <i className="fas fa-user-tie text-indigo-400 text-[10px]"></i>
+               <span className="text-[10px] font-black uppercase tracking-widest">Executive Recruiter</span>
+             </div>
+             
+             <div className="relative w-48 h-48 lg:w-64 lg:h-64">
+                <div className={`absolute inset-0 bg-indigo-600/10 rounded-full ${isLive && !loading ? 'animate-pulse' : ''}`}></div>
+                <div className="relative w-full h-full rounded-full bg-indigo-600/10 border-2 border-indigo-500/20 flex items-center justify-center overflow-hidden">
+                   <i className="fas fa-user-tie text-6xl lg:text-8xl text-indigo-500 opacity-60"></i>
+                   <canvas ref={canvasRef} width={250} height={120} className="absolute bottom-10 left-0 w-full opacity-60 pointer-events-none" />
+                </div>
+             </div>
 
-        <div className="relative glass rounded-[2.5rem] overflow-hidden flex flex-col items-center justify-center border-white/5">
-          <div className="absolute top-6 left-6 z-10 bg-black/40 px-3 py-1.5 rounded-xl border border-white/10 flex items-center gap-2"><i className="fas fa-user text-emerald-400 text-[10px]"></i><span className="text-[10px] font-black uppercase tracking-widest">Candidate (You)</span></div>
-          {mode === 'video' ? (
-            <><video ref={videoRef} autoPlay muted playsInline className={`w-full h-full object-cover transition-opacity duration-700 ${isVideoOff ? 'opacity-0' : 'opacity-100'}`} />{isVideoOff && <div className="absolute inset-0 flex items-center justify-center bg-zinc-950"><div className="w-32 h-32 rounded-full bg-zinc-900 flex items-center justify-center"><i className="fas fa-video-slash text-5xl text-zinc-700"></i></div></div>}<canvas ref={frameCanvasRef} className="hidden" /></>
-          ) : null}
-          <div className="absolute bottom-10 left-1/2 -translate-x-1/2 w-[90%] pointer-events-none z-20">
-            {userTranscription && showCaptions && <div className="bg-emerald-500/10 backdrop-blur-2xl px-8 py-5 rounded-[2rem] text-center text-xl font-bold italic border border-emerald-500/20 leading-relaxed">{userTranscription}</div>}
+             {/* Live Subtitle Overlay - AI */}
+             <div className="absolute bottom-10 left-1/2 -translate-x-1/2 w-[85%] pointer-events-none z-20">
+                {aiTranscription && showCaptions && (
+                  <div className="bg-indigo-950/90 backdrop-blur-3xl px-8 py-5 rounded-[2rem] text-center text-lg lg:text-xl font-bold italic border border-indigo-500/30 text-white shadow-2xl animate-in slide-in-from-bottom-2 duration-300">
+                    <div className="text-[9px] font-black uppercase tracking-widest mb-2 opacity-50 text-indigo-400">Interviewer</div>
+                    "{aiTranscription}"
+                  </div>
+                )}
+             </div>
+          </div>
+
+          {/* Candidate Panel */}
+          <div className="relative glass rounded-[2.5rem] overflow-hidden flex flex-col items-center justify-center border-white/5 group">
+            <div className="absolute top-6 left-6 z-10 bg-black/40 px-3 py-1.5 rounded-xl border border-white/10 flex items-center gap-2 backdrop-blur-xl">
+              <i className="fas fa-user text-emerald-400 text-[10px]"></i>
+              <span className="text-[10px] font-black uppercase tracking-widest">Candidate (You)</span>
+            </div>
+            
+            <video ref={videoRef} autoPlay muted playsInline className={`w-full h-full object-cover transition-opacity duration-700 ${isVideoOff ? 'opacity-0' : 'opacity-100'}`} />
+            
+            {isVideoOff && (
+              <div className="absolute inset-0 flex items-center justify-center bg-zinc-950">
+                <div className="w-32 h-32 rounded-full bg-zinc-900 flex items-center justify-center shadow-inner">
+                  <i className="fas fa-video-slash text-5xl text-zinc-700"></i>
+                </div>
+              </div>
+            )}
+            
+            <canvas ref={frameCanvasRef} className="hidden" />
+            <canvas ref={userCanvasRef} width={100} height={50} className="absolute top-6 right-6 w-24 h-12 opacity-40 pointer-events-none" />
+
+            {/* Live Subtitle Overlay - Candidate */}
+            <div className="absolute bottom-10 left-1/2 -translate-x-1/2 w-[85%] pointer-events-none z-20">
+              {userTranscription && showCaptions && (
+                <div className="bg-emerald-950/90 backdrop-blur-3xl px-8 py-5 rounded-[2rem] text-center text-lg lg:text-xl font-bold italic border border-emerald-500/30 text-white shadow-2xl animate-in slide-in-from-bottom-2 duration-300">
+                   <div className="text-[9px] font-black uppercase tracking-widest mb-2 opacity-50 text-emerald-400">Transcribing Candidate</div>
+                   "{userTranscription}"
+                </div>
+              )}
+            </div>
           </div>
         </div>
+
+        {/* Dynamic Transcript Sidebar */}
+        {showTranscriptPanel && (
+          <aside className="glass rounded-[2.5rem] border-white/5 flex flex-col h-full overflow-hidden animate-in slide-in-from-right-10 duration-500">
+            <header className="p-6 border-b border-white/5 flex items-center justify-between bg-white/[0.02]">
+               <h3 className="text-[10px] font-black uppercase tracking-[0.3em] text-slate-500">Live Audit Session</h3>
+               <button onClick={() => setShowTranscriptPanel(false)} className="text-slate-500 hover:text-white transition-colors"><i className="fas fa-times"></i></button>
+            </header>
+            <div ref={panelScrollRef} className="flex-grow overflow-y-auto p-6 space-y-8 scrollbar-thin scrollbar-thumb-white/10">
+               {messages.length === 0 && !userTranscription && !aiTranscription && (
+                 <div className="text-center py-20 opacity-20">
+                    <i className="fas fa-quote-right text-4xl mb-4 block"></i>
+                    <p className="text-[9px] font-black uppercase tracking-widest">Awaiting interaction...</p>
+                 </div>
+               )}
+               {messages.map((m, idx) => (
+                 <div key={idx} className={`space-y-2 ${m.role === 'interviewer' ? 'text-left' : 'text-right'}`}>
+                    <div className={`text-[8px] font-black uppercase tracking-widest ${m.role === 'interviewer' ? 'text-indigo-400' : 'text-emerald-400'}`}>{m.role}</div>
+                    <div className={`p-4 rounded-2xl text-[13px] leading-relaxed inline-block ${m.role === 'interviewer' ? 'bg-indigo-600/10 border border-indigo-500/10 text-slate-300' : 'bg-emerald-600/10 border border-emerald-500/10 text-slate-300'}`}>
+                       {m.text}
+                    </div>
+                 </div>
+               ))}
+               {(userTranscription || aiTranscription) && (
+                 <div className="space-y-6 pt-4 border-t border-white/5">
+                   {aiTranscription && (
+                     <div className="space-y-2 text-left animate-pulse">
+                        <div className="text-[8px] font-black uppercase tracking-widest text-indigo-400">Interviewer (Streaming)</div>
+                        <div className="p-4 rounded-2xl bg-indigo-600/5 text-[13px] text-indigo-200/60 leading-relaxed italic border border-indigo-500/5">{aiTranscription}</div>
+                     </div>
+                   )}
+                   {userTranscription && (
+                     <div className="space-y-2 text-right animate-pulse">
+                        <div className="text-[8px] font-black uppercase tracking-widest text-emerald-400">Candidate (Streaming)</div>
+                        <div className="p-4 rounded-2xl bg-emerald-600/5 text-[13px] text-emerald-200/60 leading-relaxed italic border border-emerald-500/5">{userTranscription}</div>
+                     </div>
+                   )}
+                 </div>
+               )}
+            </div>
+          </aside>
+        )}
       </div>
 
+      {/* Control Console */}
       <div className="h-28 bg-[#030712]/80 backdrop-blur-2xl flex items-center justify-center px-10 relative z-30 border-t border-white/5">
         <div className="flex items-center gap-5">
-          <button onClick={toggleMute} className={`w-16 h-16 rounded-3xl flex items-center justify-center transition-all shadow-xl ${isMuted ? 'bg-red-500/20 text-red-500 border border-red-500/30' : 'bg-white/5 hover:bg-white/10 text-white'}`}><i className={`fas ${isMuted ? 'fa-microphone-slash' : 'fa-microphone'} text-xl`}></i></button>
-          {mode === 'video' && <button onClick={toggleVideo} className={`w-16 h-16 rounded-3xl flex items-center justify-center transition-all shadow-xl ${isVideoOff ? 'bg-red-500/20 text-red-500 border border-red-500/30' : 'bg-white/5 hover:bg-white/10 text-white'}`}><i className={`fas ${isVideoOff ? 'fa-video-slash' : 'fa-video'} text-xl`}></i></button>}
-          <button onClick={() => setShowCaptions(!showCaptions)} className={`w-16 h-16 rounded-3xl flex items-center justify-center transition-all shadow-xl ${showCaptions ? 'bg-indigo-600 text-white shadow-indigo-600/30' : 'bg-white/5 hover:bg-white/10 text-white'}`}><i className="fas fa-closed-captioning text-xl"></i></button>
-          <button onClick={() => setIsConfirming(true)} className="px-10 h-16 bg-red-600 hover:bg-red-500 text-white rounded-3xl font-black text-xs uppercase tracking-widest flex items-center gap-3 transition-all active:scale-95 shadow-xl shadow-red-600/20 ml-6"><i className="fas fa-phone-slash rotate-[135deg]"></i> Exit Session</button>
+          <button onClick={toggleMute} className={`w-16 h-16 rounded-3xl flex items-center justify-center transition-all shadow-xl ${isMuted ? 'bg-red-500/20 text-red-500 border border-red-500/30' : 'bg-white/5 hover:bg-white/10 text-white'}`} title="Toggle Microphone">
+            <i className={`fas ${isMuted ? 'fa-microphone-slash' : 'fa-microphone'} text-xl`}></i>
+          </button>
+          <button onClick={toggleVideo} className={`w-16 h-16 rounded-3xl flex items-center justify-center transition-all shadow-xl ${isVideoOff ? 'bg-red-500/20 text-red-500 border border-red-500/30' : 'bg-white/5 hover:bg-white/10 text-white'}`} title="Toggle Video">
+            <i className={`fas ${isVideoOff ? 'fa-video-slash' : 'fa-video'} text-xl`}></i>
+          </button>
+          <div className="w-px h-10 bg-white/10 mx-2"></div>
+          <button onClick={() => setShowCaptions(!showCaptions)} className={`w-16 h-16 rounded-3xl flex items-center justify-center transition-all shadow-xl ${showCaptions ? 'bg-indigo-600 text-white shadow-indigo-600/30' : 'bg-white/5 hover:bg-white/10 text-white'}`} title="Toggle Live Captions">
+            <i className="fas fa-closed-captioning text-xl"></i>
+          </button>
+          <button onClick={() => setShowTranscriptPanel(!showTranscriptPanel)} className={`w-16 h-16 rounded-3xl flex items-center justify-center transition-all shadow-xl ${showTranscriptPanel ? 'bg-indigo-600 text-white shadow-indigo-600/30' : 'bg-white/5 hover:bg-white/10 text-white'}`} title="Toggle Transcript Sidebar">
+            <i className="fas fa-list-ul text-xl"></i>
+          </button>
+          <button onClick={() => setIsConfirming(true)} className="px-10 h-16 bg-red-600 hover:bg-red-500 text-white rounded-3xl font-black text-xs uppercase tracking-widest flex items-center gap-3 transition-all active:scale-95 shadow-xl shadow-red-600/20 ml-6">
+            <i className="fas fa-phone-slash rotate-[135deg]"></i> Exit Session
+          </button>
         </div>
       </div>
 
       {isConfirming && (
         <div className="fixed inset-0 bg-[#030712]/90 backdrop-blur-2xl z-[150] flex items-center justify-center p-6">
-          <div className="glass rounded-[3rem] p-12 max-md w-full text-center space-y-10 border-indigo-500/20 animate-in zoom-in-95">
+          <div className="glass rounded-[3rem] p-12 max-sm w-full text-center space-y-10 border-indigo-500/20 animate-in zoom-in-95">
              <div className="w-24 h-24 bg-indigo-600/10 rounded-[2rem] flex items-center justify-center mx-auto text-indigo-400 text-5xl"><i className="fas fa-check-circle"></i></div>
              <div><h3 className="text-3xl font-black mb-3 tracking-tighter">Complete Session?</h3><p className="text-slate-500 text-sm font-medium">Ending the session will generate your performance evaluation.</p></div>
              <div className="flex flex-col gap-3">
