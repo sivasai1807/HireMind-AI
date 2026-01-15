@@ -24,14 +24,14 @@ const LandingPage: React.FC<Props> = ({ onStartResume, onNavigate }) => {
           </div>
           
           <h1 className="text-7xl md:text-9xl font-black tracking-tighter text-white mb-10 leading-[0.85] animate-in fade-in slide-in-from-bottom-6 duration-1000">
-            Secure Your <br />
+            Master Your <br />
             <span className="text-transparent bg-clip-text bg-gradient-to-r from-indigo-400 via-emerald-400 to-indigo-500">
-              Next Career Step.
+              Career Trajectory.
             </span>
           </h1>
           
           <p className="text-xl md:text-2xl text-slate-400 max-w-3xl mx-auto mb-16 leading-relaxed font-medium animate-in fade-in slide-in-from-bottom-10 duration-1000 delay-150">
-            HireMind provides an advanced platform for resume optimization and realistic mock interviews designed to help you land top-tier roles.
+            The advanced AI career assistant for high-performance resume optimization, realistic mock interviews, and strategic growth planning.
           </p>
           
           <div className="flex flex-col sm:flex-row items-center justify-center gap-6 mb-32 w-full sm:w-auto animate-in fade-in slide-in-from-bottom-14 duration-1000 delay-300">
@@ -39,13 +39,13 @@ const LandingPage: React.FC<Props> = ({ onStartResume, onNavigate }) => {
               onClick={onStartResume}
               className="w-full sm:w-auto px-12 py-6 bg-indigo-600 hover:bg-indigo-500 text-white rounded-[2rem] font-black text-sm tracking-[0.2em] uppercase transition-all shadow-2xl shadow-indigo-600/40 active:scale-95 flex items-center justify-center gap-5 group"
             >
-              Analyze Resume <i className="fas fa-chevron-right group-hover:translate-x-1.5 transition-transform text-xs"></i>
+              Analyze Resume <i className="fas fa-arrow-right group-hover:translate-x-1.5 transition-transform text-xs"></i>
             </button>
             <button 
               onClick={() => onNavigate('learning-path')}
               className="w-full sm:w-auto px-12 py-6 glass hover:bg-white/10 text-white rounded-[2rem] font-black text-sm tracking-[0.2em] uppercase transition-all flex items-center justify-center gap-5 group"
             >
-              View Roadmaps <i className="fas fa-arrow-right text-xs text-indigo-400 group-hover:translate-x-1 transition-transform"></i>
+              Career Strategy <i className="fas fa-map-marked text-xs text-indigo-400 group-hover:scale-110 transition-transform"></i>
             </button>
           </div>
         </div>
@@ -55,25 +55,25 @@ const LandingPage: React.FC<Props> = ({ onStartResume, onNavigate }) => {
           {[
             {
               id: 'resume',
-              icon: "fa-file-signature",
+              icon: "fa-file-invoice",
               title: "Resume Audit",
-              desc: "Get detailed feedback on your resume based on current industry benchmarks and ATS requirements.",
+              desc: "Engineered feedback for FAANG-level benchmarks. Scan your resume for ATS compatibility and strategic improvements.",
               accent: "border-indigo-500/20",
               iconColor: "text-indigo-400"
             },
             {
               id: 'interview',
-              icon: "fa-comments",
-              title: "Mock Interviews",
-              desc: "Practice with realistic mock interviews in voice, video, or text modes with professional feedback.",
+              icon: "fa-user-check",
+              title: "Mock Interview",
+              desc: "Simulate high-stakes interviews with industry veterans. Real-time feedback in voice, video, or professional text modes.",
               accent: "border-emerald-500/20",
               iconColor: "text-emerald-400"
             },
             {
               id: 'learning-path',
-              icon: "fa-road",
-              title: "Career Roadmap",
-              desc: "Receive a personalized action plan to address your specific skill gaps and career goals.",
+              icon: "fa-map-location-dot",
+              title: "Career Strategy",
+              desc: "Define your path to principal or lead roles with personalized action plans, resource curation, and skill gap analysis.",
               accent: "border-purple-500/20",
               iconColor: "text-purple-400"
             }
@@ -95,7 +95,7 @@ const LandingPage: React.FC<Props> = ({ onStartResume, onNavigate }) => {
               <p className="text-slate-400 leading-relaxed text-base font-medium mb-10">{f.desc}</p>
               
               <div className="flex items-center gap-3 text-[11px] font-black uppercase tracking-[0.25em] text-indigo-400 opacity-60 group-hover:opacity-100 transition-opacity">
-                Get Started <i className="fas fa-arrow-right-long text-[10px]"></i>
+                Enter Tool <i className="fas fa-arrow-right-long text-[10px]"></i>
               </div>
             </div>
           ))}

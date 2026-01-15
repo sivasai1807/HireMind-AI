@@ -42,17 +42,17 @@ const LearningPathTool: React.FC<Props> = ({ onRoadmapComplete }) => {
           {/* Header Stats */}
           <div className="glass rounded-[3rem] p-10 flex flex-col md:flex-row items-center justify-between gap-8 border-indigo-500/20 glow-indigo">
              <div className="space-y-2 text-center md:text-left">
-                <h2 className="text-4xl font-black text-white tracking-tighter">Strategic Roadmap</h2>
+                <h2 className="text-4xl font-black text-white tracking-tighter">Career Strategy</h2>
                 <p className="text-slate-500 text-xs font-black uppercase tracking-widest">
-                  Path to: <span className="text-indigo-400">{result.field}</span>
+                  Strategic Focus: <span className="text-indigo-400">{result.field}</span>
                 </p>
              </div>
              <div className="flex items-center gap-6">
-                <div className="text-center">
+                <div className="text-center px-6 border-r border-white/10">
                    <div className="text-4xl font-black text-indigo-400 tabular-nums">{result.estimated_days}</div>
                    <div className="text-[10px] font-black text-slate-500 uppercase tracking-widest">Est. Days</div>
                 </div>
-                <button onClick={() => setResult(null)} className="px-6 py-3 bg-white/5 hover:bg-white/10 text-white rounded-xl text-[10px] font-black uppercase tracking-widest border border-white/5 transition-all">New Roadmap</button>
+                <button onClick={() => setResult(null)} className="px-6 py-4 bg-white/5 hover:bg-white/10 text-white rounded-2xl text-[10px] font-black uppercase tracking-widest border border-white/5 transition-all">New Strategy</button>
              </div>
           </div>
 
@@ -69,12 +69,12 @@ const LearningPathTool: React.FC<Props> = ({ onRoadmapComplete }) => {
                          </div>
                          <div className="w-full md:w-[45%]">
                             <div className="glass p-8 rounded-[2.5rem] border-l-4 border-l-indigo-500 hover:bg-white/5 transition-all group">
-                               <h3 className="text-xl font-black text-white mb-4">Week {milestone.week}: {milestone.topic}</h3>
-                               <p className="text-sm text-slate-400 mb-6 leading-relaxed">{milestone.description}</p>
+                               <h3 className="text-xl font-black text-white mb-4">Phase {milestone.week}: {milestone.topic}</h3>
+                               <p className="text-sm text-slate-400 mb-6 leading-relaxed font-medium">{milestone.description}</p>
                                <ul className="space-y-3 mb-6">
                                   {milestone.tasks.map((task, tidx) => (
                                      <li key={tidx} className="flex items-start gap-3 text-xs text-slate-300">
-                                        <i className="fas fa-check-circle text-indigo-500 mt-0.5"></i>
+                                        <i className="fas fa-check-circle text-indigo-500 mt-0.5 opacity-60"></i>
                                         <span>{task}</span>
                                      </li>
                                   ))}
@@ -98,13 +98,13 @@ const LearningPathTool: React.FC<Props> = ({ onRoadmapComplete }) => {
              <div className="lg:col-span-4 space-y-12">
                 <section className="space-y-6">
                    <h4 className="text-[10px] font-black uppercase tracking-[0.4em] text-emerald-500 px-2 flex items-center gap-3">
-                      <i className="fas fa-rocket"></i> Applied Projects
+                      <i className="fas fa-rocket"></i> Tactical Projects
                    </h4>
                    <div className="space-y-4">
                       {result.project_suggestions.map((proj, idx) => (
                          <div key={idx} className="glass p-6 rounded-[2rem] border-white/5 hover:bg-white/5 transition-all group">
                             <h5 className="text-sm font-black text-white mb-2 group-hover:text-indigo-400 transition-colors">{proj.name}</h5>
-                            <p className="text-xs text-slate-500 mb-4 leading-relaxed">{proj.description}</p>
+                            <p className="text-xs text-slate-500 mb-4 leading-relaxed font-medium">{proj.description}</p>
                             <div className="flex flex-wrap gap-2">
                                {proj.tech_stack.map((tech, tidx) => (
                                   <span key={tidx} className="text-[8px] font-black text-slate-400 bg-white/5 px-2 py-1 rounded uppercase tracking-widest">{tech}</span>
@@ -117,7 +117,7 @@ const LearningPathTool: React.FC<Props> = ({ onRoadmapComplete }) => {
 
                 <section className="space-y-6">
                    <h4 className="text-[10px] font-black uppercase tracking-[0.4em] text-indigo-400 px-2 flex items-center gap-3">
-                      <i className="fas fa-building"></i> Hiring Context
+                      <i className="fas fa-landmark"></i> Industry Alignment
                    </h4>
                    <div className="space-y-4">
                       {result.hiring_companies.map((company, idx) => (
@@ -147,30 +147,33 @@ const LearningPathTool: React.FC<Props> = ({ onRoadmapComplete }) => {
           <div className="absolute top-0 left-0 w-full h-2 bg-gradient-to-r from-indigo-500 via-emerald-500 to-indigo-500 opacity-50"></div>
           
           <header className="mb-16">
-             <h2 className="text-5xl font-black text-white tracking-tighter mb-4">Strategic Learning Path</h2>
+             <h2 className="text-5xl font-black text-white tracking-tighter mb-4">Career Strategy</h2>
              <p className="text-slate-500 text-xs font-black uppercase tracking-[0.4em] flex items-center gap-3">
                 <span className="w-1.5 h-1.5 rounded-full bg-indigo-500"></span>
-                AI-Driven Career Orchestration
+                AI-Driven Strategic Orchestration
              </p>
           </header>
 
           <div className="space-y-10">
              <div className="space-y-4">
-                <label className="text-[10px] font-black uppercase tracking-[0.3em] text-slate-500 ml-2">Target Field</label>
-                <input 
-                  type="text" 
-                  placeholder="e.g. Distributed Systems Engineer, Product Designer" 
-                  className="w-full bg-black/40 border border-white/5 rounded-[1.5rem] px-8 py-5 outline-none focus:border-indigo-500/50 transition-all font-bold text-white shadow-inner" 
-                  value={field} 
-                  onChange={(e) => setField(e.target.value)} 
-                />
+                <label className="text-[10px] font-black uppercase tracking-[0.3em] text-slate-500 ml-2">Objective Field</label>
+                <div className="relative group">
+                  <i className="fas fa-map-location-dot absolute left-6 top-1/2 -translate-y-1/2 text-slate-600 group-focus-within:text-indigo-500 transition-colors"></i>
+                  <input 
+                    type="text" 
+                    placeholder="e.g. Lead Frontend Engineer, Principal Architect" 
+                    className="w-full bg-black/40 border border-white/5 rounded-[1.5rem] pl-16 pr-8 py-5 outline-none focus:border-indigo-500/50 transition-all font-bold text-white shadow-inner" 
+                    value={field} 
+                    onChange={(e) => setField(e.target.value)} 
+                  />
+                </div>
              </div>
 
              <div className="space-y-4">
-                <label className="text-[10px] font-black uppercase tracking-[0.3em] text-slate-500 ml-2">Goal Description</label>
+                <label className="text-[10px] font-black uppercase tracking-[0.3em] text-slate-500 ml-2">Career Goal & Timeline</label>
                 <textarea 
                   rows={4}
-                  placeholder="Describe where you are now and where you want to be. (e.g. 'I am a backend dev and want to be a lead web3 dev in 3 months')" 
+                  placeholder="Where are you now, and what is your desired outcome? (e.g. 'I want to transition from Mid-level to Senior Backend in 6 months')" 
                   className="w-full bg-black/40 border border-white/5 rounded-[2rem] px-8 py-6 outline-none focus:border-indigo-500/50 transition-all font-medium text-slate-400 text-sm leading-relaxed" 
                   value={goal} 
                   onChange={(e) => setGoal(e.target.value)} 
@@ -184,9 +187,9 @@ const LearningPathTool: React.FC<Props> = ({ onRoadmapComplete }) => {
              >
                 {loading ? (
                    <span className="flex items-center justify-center gap-4">
-                      <i className="fas fa-circle-notch animate-spin"></i> Generating Strategy
+                      <i className="fas fa-circle-notch animate-spin"></i> Orchestrating Strategy
                    </span>
-                ) : 'Generate Professional Path'}
+                ) : 'Generate Professional Strategy'}
              </button>
           </div>
        </div>

@@ -93,11 +93,12 @@ const App: React.FC = () => {
   const handleRoadmapComplete = (roadmap: LearningRoadmap) => {
     setRoadmapHistory(prev => [roadmap, ...prev]);
     setActiveRoadmap(roadmap);
+    navigate('learning-path');
   };
 
   return (
     <div className="min-h-screen flex flex-col selection:bg-indigo-500/30">
-      <header className="sticky top-0 z-[100] border-b border-white/5 bg-[#030712]/60 backdrop-blur-2xl">
+      <header className="sticky top-0 z-[100] border-b border-white/5 bg-[#030712]/80 backdrop-blur-2xl">
         <div className="max-w-7xl mx-auto px-6 h-20 flex items-center justify-between">
           <button onClick={() => navigate('landing')} className="flex items-center gap-3 text-2xl font-black tracking-tighter text-white group">
             <div className="w-10 h-10 rounded-xl bg-indigo-600 flex items-center justify-center shadow-lg shadow-indigo-600/20 group-hover:scale-110 transition-transform">
@@ -106,28 +107,45 @@ const App: React.FC = () => {
             <span>HireMind</span>
           </button>
           
-          <nav className="hidden lg:flex items-center gap-10">
+          <nav className="hidden xl:flex items-center gap-10">
             {[
               { id: 'resume', label: 'Resume Audit' },
               { id: 'interview', label: 'Mock Interview' },
-              { id: 'learning-path', label: 'Career Roadmap' },
-              { id: 'dashboard', label: 'My Progress' }
+              { id: 'learning-path', label: 'Career Strategy' }
             ].map((v) => (
               <button 
                 key={v.id}
                 onClick={() => navigate(v.id as AppView)} 
-                className={`text-[10px] font-black uppercase tracking-[0.2em] transition-all hover:text-white ${view === v.id ? 'text-indigo-400' : 'text-slate-500'}`}
+                className={`text-[10px] font-black uppercase tracking-[0.25em] transition-all hover:text-white relative group py-2 ${view === v.id ? 'text-indigo-400' : 'text-slate-500'}`}
               >
                 {v.label}
+                <span className={`absolute bottom-0 left-0 h-0.5 bg-indigo-500 transition-all duration-300 ${view === v.id ? 'w-full' : 'w-0 group-hover:w-full'}`}></span>
               </button>
             ))}
           </nav>
 
-          <div className="flex items-center gap-6">
-            <button onClick={() => navigate('resume')} className="hidden sm:block px-6 py-3 bg-white/5 hover:bg-white/10 text-white rounded-xl text-[10px] font-black uppercase tracking-widest transition-all">
-              Analyze Resume
+          <div className="flex items-center gap-4">
+            <button 
+              onClick={() => navigate('dashboard')} 
+              className={`flex items-center gap-3 px-5 py-3 rounded-xl transition-all ${view === 'dashboard' ? 'bg-indigo-600/20 text-indigo-400 border border-indigo-500/30' : 'bg-white/5 hover:bg-white/10 text-slate-400'}`}
+            >
+              <i className="fas fa-chart-line text-sm"></i>
+              <span className="hidden lg:inline text-[9px] font-black uppercase tracking-widest">Dashboard</span>
             </button>
-            <button onClick={() => navigate('interview')} className="px-6 py-3 bg-indigo-600 hover:bg-indigo-500 text-white rounded-xl text-[10px] font-black uppercase tracking-widest transition-all shadow-xl shadow-indigo-600/20 active:scale-95">
+            
+            <div className="w-px h-8 bg-white/10 mx-1 hidden sm:block"></div>
+
+            <button 
+              onClick={() => navigate('resume')} 
+              className="hidden sm:flex items-center gap-3 px-6 py-3 bg-white/5 hover:bg-white/10 text-white rounded-xl text-[10px] font-black uppercase tracking-widest transition-all border border-white/5"
+            >
+              Audit Resume
+            </button>
+            
+            <button 
+              onClick={() => navigate('interview')} 
+              className="px-6 py-3 bg-indigo-600 hover:bg-indigo-500 text-white rounded-xl text-[10px] font-black uppercase tracking-widest transition-all shadow-xl shadow-indigo-600/20 active:scale-95"
+            >
               Start Practice
             </button>
           </div>
@@ -169,15 +187,20 @@ const App: React.FC = () => {
 
       <footer className="border-t border-white/5 py-16 bg-[#030712]/40">
         <div className="max-w-7xl mx-auto px-6 text-center">
-          <div className="text-2xl font-black mb-4">HireMind</div>
-          <p className="text-slate-500 text-sm max-w-md mx-auto mb-10 font-medium">Precision tools for modern career development and recruitment readiness.</p>
+          <div className="flex justify-center mb-8">
+            <div className="w-12 h-12 rounded-2xl bg-indigo-600 flex items-center justify-center text-xl text-white">
+              <i className="fas fa-briefcase"></i>
+            </div>
+          </div>
+          <div className="text-2xl font-black mb-4 tracking-tighter">HireMind</div>
+          <p className="text-slate-500 text-sm max-w-md mx-auto mb-10 font-medium">Precision tools for modern career development and FAANG-level recruitment readiness.</p>
           <div className="flex justify-center gap-8 mb-12">
             {['linkedin', 'twitter', 'github'].map(social => (
               <i key={social} className={`fab fa-${social} text-slate-500 hover:text-white text-xl cursor-pointer transition-colors`}></i>
             ))}
           </div>
           <div className="text-[10px] font-bold text-slate-700 uppercase tracking-[0.3em]">
-            &copy; {new Date().getFullYear()} HireMind Career Systems. Built for professional growth.
+            &copy; {new Date().getFullYear()} HireMind Career Systems. Professional Growth Excellence.
           </div>
         </div>
       </footer>
